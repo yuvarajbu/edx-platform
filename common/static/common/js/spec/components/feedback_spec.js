@@ -4,7 +4,7 @@
   define(["jquery", "common/js/components/views/feedback", "common/js/components/views/feedback_notification", "common/js/components/views/feedback_alert", "common/js/components/views/feedback_prompt", 'common/js/spec_helpers/view_helpers', "sinon", "jquery.simulate"],
     function($, SystemFeedback, NotificationView, AlertView, PromptView, ViewHelpers, sinon) {
     var tpl;
-    tpl = readFixtures('system-feedback.underscore');
+    tpl = readFixtures('components/system-feedback.underscore');
     beforeEach(function() {
       setFixtures(sandbox({
         id: "page-alert"

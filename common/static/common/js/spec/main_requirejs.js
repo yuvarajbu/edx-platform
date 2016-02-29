@@ -1,5 +1,16 @@
+var specs = [],
+    config = {};
+
+// You can automatically get the test files using karma's configs
+for (var file in window.__karma__.files) {
+    if (/common\/js\/spec\/(components|utils)\/.*spec\.js$/.test(file)) {
+        specs.push(file);
+    }
+}
+
 (function(requirejs, define) {
     requirejs.config({
+        baseUrl: '/base/',
         paths: {
             'gettext': 'js/test/i18n',
             'jquery': 'js/vendor/jquery.min',
@@ -134,15 +145,15 @@
             'URI': {
                 exports: 'URI'
             },
-            'jasmine-jquery': {
-                deps: ['jasmine']
-            },
+            //'jasmine-jquery': {
+            //    deps: ['jasmine']
+            //},
             'jasmine-imagediff': {
                 deps: ['jasmine']
             },
-            'jasmine-stealth': {
-                deps: ['jasmine']
-            },
+            //'jasmine-stealth': {
+            //    deps: ['jasmine']
+            //},
             'jasmine.async': {
                 deps: ['jasmine'],
                 exports: 'AsyncSpec'
@@ -150,20 +161,12 @@
             "sinon": {
                 exports: "sinon"
             }
-        }
+        },
+        deps: specs,
+        callback: window.__karma__.start
     });
 
-    define([
-        // Run the common tests that use RequireJS.
-        'common-requirejs/include/common/js/spec/components/feedback_spec.js',
-        'common-requirejs/include/common/js/spec/components/list_spec.js',
-        'common-requirejs/include/common/js/spec/components/paginated_view_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_collection_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_header_spec.js',
-        'common-requirejs/include/common/js/spec/components/paging_footer_spec.js',
-        'common-requirejs/include/common/js/spec/components/search_field_spec.js',
-        'common-requirejs/include/common/js/spec/components/view_utils_spec.js',
-        'common-requirejs/include/common/js/spec/utils/edx.utils.validate_spec.js'
-    ]);
+    // By default, fixtures are loaded from spec/javascripts/fixtures
+    jasmine.getFixtures().fixturesPath = 'base/common/templates/';
 
 }).call(this, requirejs, define);

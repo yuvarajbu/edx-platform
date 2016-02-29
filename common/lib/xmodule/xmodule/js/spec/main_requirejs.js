@@ -1,10 +1,13 @@
 (function(requirejs) {
     requirejs.config({
+        baseUrl: '/base/',
         paths: {
-            "moment": "xmodule/include/common_static/js/vendor/moment.min"
+            "moment": "common_static/js/vendor/moment.min"
         },
-        "moment": {
-            exports: "moment"
+        shim: {
+            "moment": {
+                exports: "moment"
+            }
         }
     });
 

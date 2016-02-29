@@ -122,8 +122,8 @@ class Env(object):
         REPO_ROOT / 'cms/static/js_test.yml',
         REPO_ROOT / 'cms/static/js_test_squire.yml',
         REPO_ROOT / 'common/lib/xmodule/xmodule/js/js_test.yml',
-        REPO_ROOT / 'common/static/js_test.yml',
-        REPO_ROOT / 'common/static/js_test_requirejs.yml',
+        REPO_ROOT / 'common/static/test.karma.conf.js',
+        REPO_ROOT / 'common/static/test.requirejs.karma.conf.js',
     ]
 
     JS_TEST_ID_KEYS = [

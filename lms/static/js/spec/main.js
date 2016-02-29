@@ -1,6 +1,28 @@
+var specs = [],
+    config = {};
+
+
+// collect all spec files
+for (var file in window.__karma__.files) {
+    // this regex will match any path that contains js/spec
+    // a better regex would be    /js\/spec\/.*_spec\.js$/
+    // but some spec files not ends with _spec.js like below
+    // js/spec/courseware/course_home_events.js
+    // js/spec/dashboard/donation.js
+    // js/spec/courseware/updates_visibility.js
+    //console.log(file);
+    if (/js\/spec\/.*\.js$/.test(file)) {
+        specs.push(file);
+    }
+}
+
+console.log('total specs >> ' + specs.length);
+console.log(specs);
+
 (function(requirejs, define) {
     // TODO: how can we share the vast majority of this config that is in common with CMS?
     requirejs.config({
+        baseUrl: '/base/',
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
@@ -49,8 +71,8 @@
             'jasmine.async': 'xmodule_js/common_static/js/vendor/jasmine.async',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly.pkgd',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
-            'mathjax': '//cdn.mathjax.org/mathjax/2.5-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured', // jshint ignore:line
-            'youtube': '//www.youtube.com/player_api?noext',
+            'mathjax': 'cdn.mathjax.org/mathjax/2.5-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured', // jshint ignore:line
+            'youtube': 'www.youtube.com/player_api?noext',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
             'coffee/src/instructor_dashboard/student_admin': 'coffee/src/instructor_dashboard/student_admin',
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
@@ -267,9 +289,9 @@
             'sinon': {
                 exports: 'sinon'
             },
-            'jasmine-jquery': {
-                deps: ['jasmine']
-            },
+            //'jasmine-jquery': {
+            //    deps: ['jasmine']
+            //},
             'jasmine-imagediff': {
                 deps: ['jasmine']
             },
@@ -636,117 +658,119 @@
                 exports: 'DiscussionSpecHelper'
             }
 
-        }
+        },
+        deps: specs,
+        callback: window.__karma__.start
     });
 
     // TODO: why do these need 'lms/include' at the front but the CMS equivalent logic doesn't?
-    define([
-        // Run the LMS tests
-        'lms/include/js/spec/components/header/header_spec.js',
-        'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
-        'lms/include/js/spec/components/card/card_spec.js',
-        'lms/include/js/spec/staff_debug_actions_spec.js',
-        'lms/include/js/spec/views/notification_spec.js',
-        'lms/include/js/spec/views/file_uploader_spec.js',
-        'lms/include/js/spec/dashboard/donation.js',
-        'lms/include/js/spec/dashboard/track_events_spec.js',
-        'lms/include/js/spec/groups/views/cohorts_spec.js',
-        'lms/include/js/spec/shoppingcart/shoppingcart_spec.js',
-        'lms/include/js/spec/instructor_dashboard/ecommerce_spec.js',
-        'lms/include/js/spec/instructor_dashboard/student_admin_spec.js',
-        'lms/include/js/spec/instructor_dashboard/certificates_exception_spec.js',
-        'lms/include/js/spec/instructor_dashboard/certificates_invalidation_spec.js',
-        'lms/include/js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
-        'lms/include/js/spec/instructor_dashboard/certificates_spec.js',
-        'lms/include/js/spec/student_account/account_spec.js',
-        'lms/include/js/spec/student_account/access_spec.js',
-        'lms/include/js/spec/student_account/logistration_factory_spec.js',
-        'lms/include/js/spec/student_account/finish_auth_spec.js',
-        'lms/include/js/spec/student_account/hinted_login_spec.js',
-        'lms/include/js/spec/student_account/login_spec.js',
-        'lms/include/js/spec/student_account/institution_login_spec.js',
-        'lms/include/js/spec/student_account/register_spec.js',
-        'lms/include/js/spec/student_account/password_reset_spec.js',
-        'lms/include/js/spec/student_account/enrollment_spec.js',
-        'lms/include/js/spec/student_account/emailoptin_spec.js',
-        'lms/include/js/spec/student_account/shoppingcart_spec.js',
-        'lms/include/js/spec/student_account/account_settings_factory_spec.js',
-        'lms/include/js/spec/student_account/account_settings_fields_spec.js',
-        'lms/include/js/spec/student_account/account_settings_view_spec.js',
-        'lms/include/js/spec/views/fields_spec.js',
-        'lms/include/js/spec/student_profile/learner_profile_factory_spec.js',
-        'lms/include/js/spec/student_profile/learner_profile_view_spec.js',
-        'lms/include/js/spec/student_profile/learner_profile_fields_spec.js',
-        'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
-        'lms/include/js/spec/verify_student/reverify_view_spec.js',
-        'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
-        'lms/include/js/spec/verify_student/image_input_spec.js',
-        'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',
-        'lms/include/js/spec/verify_student/make_payment_step_view_spec.js',
-        'lms/include/js/spec/verify_student/make_payment_step_view_ab_testing_spec.js',
-        'lms/include/js/spec/edxnotes/utils/logger_spec.js',
-        'lms/include/js/spec/edxnotes/views/notes_factory_spec.js',
-        'lms/include/js/spec/edxnotes/views/shim_spec.js',
-        'lms/include/js/spec/edxnotes/views/note_item_spec.js',
-        'lms/include/js/spec/edxnotes/views/notes_page_spec.js',
-        'lms/include/js/spec/edxnotes/views/search_box_spec.js',
-        'lms/include/js/spec/edxnotes/views/tabs_list_spec.js',
-        'lms/include/js/spec/edxnotes/views/tab_item_spec.js',
-        'lms/include/js/spec/edxnotes/views/tab_view_spec.js',
-        'lms/include/js/spec/edxnotes/views/tabs/search_results_spec.js',
-        'lms/include/js/spec/edxnotes/views/tabs/recent_activity_spec.js',
-        'lms/include/js/spec/edxnotes/views/tabs/course_structure_spec.js',
-        'lms/include/js/spec/edxnotes/views/tabs/tags_spec.js',
-        'lms/include/js/spec/edxnotes/views/visibility_decorator_spec.js',
-        'lms/include/js/spec/edxnotes/views/notes_visibility_factory_spec.js',
-        'lms/include/js/spec/edxnotes/models/tab_spec.js',
-        'lms/include/js/spec/edxnotes/models/note_spec.js',
-        'lms/include/js/spec/edxnotes/plugins/accessibility_spec.js',
-        'lms/include/js/spec/edxnotes/plugins/events_spec.js',
-        'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
-        'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
-        'lms/include/js/spec/edxnotes/collections/notes_spec.js',
-        'lms/include/js/spec/search/search_spec.js',
-        'lms/include/js/spec/navigation_spec.js',
-        'lms/include/js/spec/courseware/updates_visibility.js',
-        'lms/include/js/spec/discovery/collections/filters_spec.js',
-        'lms/include/js/spec/discovery/models/course_card_spec.js',
-        'lms/include/js/spec/discovery/models/course_directory_spec.js',
-        'lms/include/js/spec/discovery/models/facet_option_spec.js',
-        'lms/include/js/spec/discovery/models/filter_spec.js',
-        'lms/include/js/spec/discovery/models/search_state_spec.js',
-        'lms/include/js/spec/discovery/views/course_card_spec.js',
-        'lms/include/js/spec/discovery/views/courses_listing_spec.js',
-        'lms/include/js/spec/discovery/views/filter_bar_spec.js',
-        'lms/include/js/spec/discovery/views/refine_sidebar_spec.js',
-        'lms/include/js/spec/discovery/views/search_form_spec.js',
-        'lms/include/js/spec/discovery/discovery_factory_spec.js',
-        'lms/include/js/spec/ccx/schedule_spec.js',
-        'lms/include/support/js/spec/collections/enrollment_spec.js',
-        'lms/include/support/js/spec/models/enrollment_spec.js',
-        'lms/include/support/js/spec/views/enrollment_modal_spec.js',
-        'lms/include/support/js/spec/views/enrollment_spec.js',
-        'lms/include/support/js/spec/views/certificates_spec.js',
-        'lms/include/teams/js/spec/collections/topic_collection_spec.js',
-        'lms/include/teams/js/spec/teams_tab_factory_spec.js',
-        'lms/include/teams/js/spec/views/edit_team_spec.js',
-        'lms/include/teams/js/spec/views/edit_team_members_spec.js',
-        'lms/include/teams/js/spec/views/instructor_tools_spec.js',
-        'lms/include/teams/js/spec/views/my_teams_spec.js',
-        'lms/include/teams/js/spec/views/team_card_spec.js',
-        'lms/include/teams/js/spec/views/team_discussion_spec.js',
-        'lms/include/teams/js/spec/views/team_profile_spec.js',
-        'lms/include/teams/js/spec/views/teams_spec.js',
-        'lms/include/teams/js/spec/views/teams_tab_spec.js',
-        'lms/include/teams/js/spec/views/topic_card_spec.js',
-        'lms/include/teams/js/spec/views/topic_teams_spec.js',
-        'lms/include/teams/js/spec/views/topics_spec.js',
-        'lms/include/teams/js/spec/views/team_profile_header_actions_spec.js',
-        'lms/include/js/spec/financial-assistance/financial_assistance_form_view_spec.js',
-        'lms/include/js/spec/bookmarks/bookmarks_list_view_spec.js',
-        'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js',
-        'lms/include/js/spec/views/message_banner_spec.js',
-        'lms/include/js/spec/markdown_editor_spec.js'
-    ]);
+    //define([
+    //    // Run the LMS tests
+    //    'lms/include/js/spec/components/header/header_spec.js',
+    //    'lms/include/js/spec/components/tabbed/tabbed_view_spec.js',
+    //    'lms/include/js/spec/components/card/card_spec.js',
+    //    'lms/include/js/spec/staff_debug_actions_spec.js',
+    //    'lms/include/js/spec/views/notification_spec.js',
+    //    'lms/include/js/spec/views/file_uploader_spec.js',
+    //    'lms/include/js/spec/dashboard/donation.js',
+    //    'lms/include/js/spec/dashboard/track_events_spec.js',
+    //    'lms/include/js/spec/groups/views/cohorts_spec.js',
+    //    'lms/include/js/spec/shoppingcart/shoppingcart_spec.js',
+    //    'lms/include/js/spec/instructor_dashboard/ecommerce_spec.js',
+    //    'lms/include/js/spec/instructor_dashboard/student_admin_spec.js',
+    //    'lms/include/js/spec/instructor_dashboard/certificates_exception_spec.js',
+    //    'lms/include/js/spec/instructor_dashboard/certificates_invalidation_spec.js',
+    //    'lms/include/js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
+    //    'lms/include/js/spec/instructor_dashboard/certificates_spec.js',
+    //    'lms/include/js/spec/student_account/account_spec.js',
+    //    'lms/include/js/spec/student_account/access_spec.js',
+    //    'lms/include/js/spec/student_account/logistration_factory_spec.js',
+    //    'lms/include/js/spec/student_account/finish_auth_spec.js',
+    //    'lms/include/js/spec/student_account/hinted_login_spec.js',
+    //    'lms/include/js/spec/student_account/login_spec.js',
+    //    'lms/include/js/spec/student_account/institution_login_spec.js',
+    //    'lms/include/js/spec/student_account/register_spec.js',
+    //    'lms/include/js/spec/student_account/password_reset_spec.js',
+    //    'lms/include/js/spec/student_account/enrollment_spec.js',
+    //    'lms/include/js/spec/student_account/emailoptin_spec.js',
+    //    'lms/include/js/spec/student_account/shoppingcart_spec.js',
+    //    'lms/include/js/spec/student_account/account_settings_factory_spec.js',
+    //    'lms/include/js/spec/student_account/account_settings_fields_spec.js',
+    //    'lms/include/js/spec/student_account/account_settings_view_spec.js',
+    //    'lms/include/js/spec/views/fields_spec.js',
+    //    'lms/include/js/spec/student_profile/learner_profile_factory_spec.js',
+    //    'lms/include/js/spec/student_profile/learner_profile_view_spec.js',
+    //    'lms/include/js/spec/student_profile/learner_profile_fields_spec.js',
+    //    'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
+    //    'lms/include/js/spec/verify_student/reverify_view_spec.js',
+    //    'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
+    //    'lms/include/js/spec/verify_student/image_input_spec.js',
+    //    'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',
+    //    'lms/include/js/spec/verify_student/make_payment_step_view_spec.js',
+    //    'lms/include/js/spec/verify_student/make_payment_step_view_ab_testing_spec.js',
+    //    'lms/include/js/spec/edxnotes/utils/logger_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/notes_factory_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/shim_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/note_item_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/notes_page_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/search_box_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/tabs_list_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/tab_item_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/tab_view_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/tabs/search_results_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/tabs/recent_activity_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/tabs/course_structure_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/tabs/tags_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/visibility_decorator_spec.js',
+    //    'lms/include/js/spec/edxnotes/views/notes_visibility_factory_spec.js',
+    //    'lms/include/js/spec/edxnotes/models/tab_spec.js',
+    //    'lms/include/js/spec/edxnotes/models/note_spec.js',
+    //    'lms/include/js/spec/edxnotes/plugins/accessibility_spec.js',
+    //    'lms/include/js/spec/edxnotes/plugins/events_spec.js',
+    //    'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
+    //    'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
+    //    'lms/include/js/spec/edxnotes/collections/notes_spec.js',
+    //    'lms/include/js/spec/search/search_spec.js',
+    //    'lms/include/js/spec/navigation_spec.js',
+    //    'lms/include/js/spec/courseware/updates_visibility.js',
+    //    'lms/include/js/spec/discovery/collections/filters_spec.js',
+    //    'lms/include/js/spec/discovery/models/course_card_spec.js',
+    //    'lms/include/js/spec/discovery/models/course_directory_spec.js',
+    //    'lms/include/js/spec/discovery/models/facet_option_spec.js',
+    //    'lms/include/js/spec/discovery/models/filter_spec.js',
+    //    'lms/include/js/spec/discovery/models/search_state_spec.js',
+    //    'lms/include/js/spec/discovery/views/course_card_spec.js',
+    //    'lms/include/js/spec/discovery/views/courses_listing_spec.js',
+    //    'lms/include/js/spec/discovery/views/filter_bar_spec.js',
+    //    'lms/include/js/spec/discovery/views/refine_sidebar_spec.js',
+    //    'lms/include/js/spec/discovery/views/search_form_spec.js',
+    //    'lms/include/js/spec/discovery/discovery_factory_spec.js',
+    //    'lms/include/js/spec/ccx/schedule_spec.js',
+    //    'lms/include/support/js/spec/collections/enrollment_spec.js',
+    //    'lms/include/support/js/spec/models/enrollment_spec.js',
+    //    'lms/include/support/js/spec/views/enrollment_modal_spec.js',
+    //    'lms/include/support/js/spec/views/enrollment_spec.js',
+    //    'lms/include/support/js/spec/views/certificates_spec.js',
+    //    'lms/include/teams/js/spec/collections/topic_collection_spec.js',
+    //    'lms/include/teams/js/spec/teams_tab_factory_spec.js',
+    //    'lms/include/teams/js/spec/views/edit_team_spec.js',
+    //    'lms/include/teams/js/spec/views/edit_team_members_spec.js',
+    //    'lms/include/teams/js/spec/views/instructor_tools_spec.js',
+    //    'lms/include/teams/js/spec/views/my_teams_spec.js',
+    //    'lms/include/teams/js/spec/views/team_card_spec.js',
+    //    'lms/include/teams/js/spec/views/team_discussion_spec.js',
+    //    'lms/include/teams/js/spec/views/team_profile_spec.js',
+    //    'lms/include/teams/js/spec/views/teams_spec.js',
+    //    'lms/include/teams/js/spec/views/teams_tab_spec.js',
+    //    'lms/include/teams/js/spec/views/topic_card_spec.js',
+    //    'lms/include/teams/js/spec/views/topic_teams_spec.js',
+    //    'lms/include/teams/js/spec/views/topics_spec.js',
+    //    'lms/include/teams/js/spec/views/team_profile_header_actions_spec.js',
+    //    'lms/include/js/spec/financial-assistance/financial_assistance_form_view_spec.js',
+    //    'lms/include/js/spec/bookmarks/bookmarks_list_view_spec.js',
+    //    'lms/include/js/spec/bookmarks/bookmark_button_view_spec.js',
+    //    'lms/include/js/spec/views/message_banner_spec.js',
+    //    'lms/include/js/spec/markdown_editor_spec.js'
+    //]);
 
 }).call(this, requirejs, define);

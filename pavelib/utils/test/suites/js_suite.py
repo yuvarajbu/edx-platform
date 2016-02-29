@@ -43,23 +43,25 @@ class JsTestSuite(TestSuite):
     @property
     def cmd(self):
         """
-        Run the tests using js-test-tool. See js-test-tool docs for
-        description of different command line arguments.
+        Run the tests using karma runner.
         """
         cmd = (
-            "js-test-tool {mode} {test_id} --use-firefox --timeout-sec "
-            "600 --xunit-report {xunit_report}".format(
-                mode=self.mode,
+            "karma start {test_id} --single-run={single_run} --capture-timeout=60000 "
+            "--junitreportpath={xunit_report}".format(
+                single_run='false' if self.mode == 'dev' else 'true',
                 test_id=self.test_id,
                 xunit_report=self.xunit_report,
             )
         )
 
+        if self.mode == 'dev':
+            cmd += " --browsers=Chrome"
+
         if self.port:
-            cmd += " -p {port}".format(port=self.port)
+            cmd += " --port {port}".format(port=self.port)
 
         if self.run_under_coverage:
-            cmd += " --coverage-xml {report_dir}".format(
+            cmd += " --coverage  --coveragereportpath={report_dir}".format(
                 report_dir=self.coverage_report
             )
 

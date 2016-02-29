@@ -8,8 +8,15 @@
     "underscore": "1.4.4"
   },
   "devDependencies": {
-    "jshint": "^2.7.0",
     "edx-custom-a11y-rules": "edx/edx-custom-a11y-rules",
+    "jshint": "^2.7.0",
+    "karma": "^0.13.21",
+    "karma-coverage": "^0.5.3",
+    "karma-firefox-launcher": "~0.1",
+    "karma-jasmine": "~0.1.0",
+    "karma-junit-reporter": "git+https://github.com/karma-runner/karma-junit-reporter.git",
+    "karma-requirejs": "^0.2.5",
+    "karma-spec-reporter": "0.0.24",
     "plato": "1.2.2"
   }
 }

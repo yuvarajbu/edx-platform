@@ -132,7 +132,8 @@ describe "DiscussionThreadListView", ->
           }),
         ]
 
-        spyOn($, "ajax")
+        deferred = $.Deferred()
+        spyOn($, "ajax").andReturn(deferred)
 
         @discussion = new Discussion([])
         @view = new DiscussionThreadListView(
