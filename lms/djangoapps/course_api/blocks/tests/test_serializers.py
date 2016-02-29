@@ -1,19 +1,29 @@
 """
 Tests for Course Blocks serializers
 """
+import copy
+from django.conf import settings
 from mock import MagicMock
+from uuid import uuid4
 
 from course_blocks.tests.helpers import EnableTransformerRegistryMixin
 from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import UserFactory
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from lms.djangoapps.course_blocks.api import get_course_blocks, COURSE_BLOCK_ACCESS_TRANSFORMERS
 
 from ..transformers.blocks_api import BlocksAPITransformer
 from ..serializers import BlockSerializer, BlockDictSerializer
 from .helpers import deserialize_usage_key
 
+TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
+TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 class TestBlockSerializerBase(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
     """
@@ -24,6 +34,15 @@ class TestBlockSerializerBase(EnableTransformerRegistryMixin, SharedModuleStoreT
         super(TestBlockSerializerBase, cls).setUpClass()
 
         cls.course = ToyCourseFactory.create()
+
+        # content_store = contentstore()
+        # module_store = modulestore()
+        # user = UserFactory.create()
+        # courses = import_course_from_xml(
+        #     module_store, user.id, TEST_DATA_DIR, ['toy'], do_import_static=False, verbose=True,
+        #     create_if_not_present=True
+        # )
+        # cls.course = courses[0]
 
     def setUp(self):
         super(TestBlockSerializerBase, self).setUp()
