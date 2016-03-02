@@ -437,6 +437,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         context = {
             'csrf': csrf(request)['csrf_token'],
+            'accordion': render_accordion(user, request, course, chapter, section, field_data_cache),
             'COURSE_TITLE': course.display_name_with_default_escaped,
             'course': course,
             'init': '',
@@ -502,7 +503,15 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
         if section is None:
             section_descriptor = get_current_child(chapter_module, first_child=request.GET.get("first_child"))
-            section = section_descriptor.url_name
+            if section_descriptor:
+                section = section_descriptor.url_name
+            else:
+                # Something went wrong -- perhaps this chapter has no sections visible to the user.
+                # Clearing out the last-visited state and showing "first-time" view by redirecting
+                # to courseware.
+                course_module.position = None
+                course_module.save()
+                return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
         else:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.location.name == section)
 
