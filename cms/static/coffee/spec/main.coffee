@@ -1,4 +1,17 @@
+specs = []
+config = {}
+
+#// You can automatically get the test files using karma's configs
+for file in window.__karma__.files
+#    if (/common\/js\/spec\/(components|utils)\/.*spec\.js$/.test(file))
+    if (/coffee\/spec\/.*spec\.js$/.test(file))
+        specs.push file
+
+console.log(specs)
+
+
 requirejs.config({
+    baseUrl: '/base/',
     paths: {
         "gettext": "xmodule_js/common_static/js/test/i18n",
         "mustache": "xmodule_js/common_static/js/vendor/mustache",
@@ -207,83 +220,85 @@ requirejs.config({
         "coffee/src/ajax_prefix": {
             deps: ["jquery"]
         }
-    }
+    },
+    deps: specs,
+    callback: window.__karma__.start
 });
 
 jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 
-define([
-    "coffee/spec/main_spec",
-
-    "coffee/spec/models/course_spec", "coffee/spec/models/metadata_spec",
-    "coffee/spec/models/section_spec",
-    "coffee/spec/models/settings_course_grader_spec",
-    "coffee/spec/models/settings_grading_spec", "coffee/spec/models/textbook_spec",
-    "coffee/spec/models/upload_spec",
-
-    "coffee/spec/views/course_info_spec",
-    "coffee/spec/views/metadata_edit_spec",
-    "coffee/spec/views/module_edit_spec",
-    "coffee/spec/views/textbook_spec",
-    "coffee/spec/views/upload_spec",
-
-    "js/spec/video/transcripts/utils_spec", "js/spec/video/transcripts/editor_spec",
-    "js/spec/video/transcripts/videolist_spec", "js/spec/video/transcripts/message_manager_spec",
-    "js/spec/video/transcripts/file_uploader_spec",
-
-    "js/spec/models/component_template_spec",
-    "js/spec/models/explicit_url_spec",
-    "js/spec/models/xblock_info_spec",
-    "js/spec/models/xblock_validation_spec",
-    "js/spec/models/license_spec",
-
-    "js/spec/utils/drag_and_drop_spec",
-    "js/spec/utils/handle_iframe_binding_spec",
-    "js/spec/utils/module_spec",
-
-    "js/spec/views/active_video_upload_list_spec",
-    "js/spec/views/previous_video_upload_spec",
-    "js/spec/views/previous_video_upload_list_spec",
-    "js/spec/views/assets_spec",
-    "js/spec/views/baseview_spec",
-    "js/spec/views/container_spec",
-    "js/spec/views/paged_container_spec",
-    "js/spec/views/group_configuration_spec",
-    "js/spec/views/unit_outline_spec",
-    "js/spec/views/xblock_spec",
-    "js/spec/views/xblock_editor_spec",
-    "js/spec/views/xblock_string_field_editor_spec",
-    "js/spec/views/xblock_validation_spec",
-    "js/spec/views/license_spec",
-    "js/spec/views/paging_spec",
-    "js/spec/views/login_studio_spec",
-
-    "js/spec/views/pages/container_spec",
-    "js/spec/views/pages/container_subviews_spec",
-    "js/spec/views/pages/group_configurations_spec",
-    "js/spec/views/pages/course_outline_spec",
-    "js/spec/views/pages/course_rerun_spec",
-    "js/spec/views/pages/index_spec",
-    "js/spec/views/pages/library_users_spec",
-
-    "js/spec/views/modals/base_modal_spec",
-    "js/spec/views/modals/edit_xblock_spec",
-    "js/spec/views/modals/validation_error_modal_spec",
-
-    "js/spec/views/settings/main_spec",
-
-    "js/spec/factories/xblock_validation_spec",
-
-    "js/spec/xblock/cms.runtime.v1_spec",
-
+#define([
+#    "coffee/spec/main_spec",
+#
+#    "coffee/spec/models/course_spec", "coffee/spec/models/metadata_spec",
+#    "coffee/spec/models/section_spec",
+#    "coffee/spec/models/settings_course_grader_spec",
+#    "coffee/spec/models/settings_grading_spec", "coffee/spec/models/textbook_spec",
+#    "coffee/spec/models/upload_spec",
+#
+#    "coffee/spec/views/course_info_spec",
+#    "coffee/spec/views/metadata_edit_spec",
+#    "coffee/spec/views/module_edit_spec",
+#    "coffee/spec/views/textbook_spec",
+#    "coffee/spec/views/upload_spec",
+#
+#    "js/spec/video/transcripts/utils_spec", "js/spec/video/transcripts/editor_spec",
+#    "js/spec/video/transcripts/videolist_spec", "js/spec/video/transcripts/message_manager_spec",
+#    "js/spec/video/transcripts/file_uploader_spec",
+#
+#    "js/spec/models/component_template_spec",
+#    "js/spec/models/explicit_url_spec",
+#    "js/spec/models/xblock_info_spec",
+#    "js/spec/models/xblock_validation_spec",
+#    "js/spec/models/license_spec",
+#
+#    "js/spec/utils/drag_and_drop_spec",
+#    "js/spec/utils/handle_iframe_binding_spec",
+#    "js/spec/utils/module_spec",
+#
+#    "js/spec/views/active_video_upload_list_spec",
+#    "js/spec/views/previous_video_upload_spec",
+#    "js/spec/views/previous_video_upload_list_spec",
+#    "js/spec/views/assets_spec",
+#    "js/spec/views/baseview_spec",
+#    "js/spec/views/container_spec",
+#    "js/spec/views/paged_container_spec",
+#    "js/spec/views/group_configuration_spec",
+#    "js/spec/views/unit_outline_spec",
+#    "js/spec/views/xblock_spec",
+#    "js/spec/views/xblock_editor_spec",
+#    "js/spec/views/xblock_string_field_editor_spec",
+#    "js/spec/views/xblock_validation_spec",
+#    "js/spec/views/license_spec",
+#    "js/spec/views/paging_spec",
+#    "js/spec/views/login_studio_spec",
+#
+#    "js/spec/views/pages/container_spec",
+#    "js/spec/views/pages/container_subviews_spec",
+#    "js/spec/views/pages/group_configurations_spec",
+#    "js/spec/views/pages/course_outline_spec",
+#    "js/spec/views/pages/course_rerun_spec",
+#    "js/spec/views/pages/index_spec",
+#    "js/spec/views/pages/library_users_spec",
+#
+#    "js/spec/views/modals/base_modal_spec",
+#    "js/spec/views/modals/edit_xblock_spec",
+#    "js/spec/views/modals/validation_error_modal_spec",
+#
+#    "js/spec/views/settings/main_spec",
+#
+#    "js/spec/factories/xblock_validation_spec",
+#
+#    "js/spec/xblock/cms.runtime.v1_spec",
+#
     # Certificates application test suite mappings
-    "js/certificates/spec/models/certificate_spec",
-    "js/certificates/spec/views/certificate_details_spec",
-    "js/certificates/spec/views/certificate_editor_spec",
-    "js/certificates/spec/views/certificates_list_spec",
-    "js/certificates/spec/views/certificate_preview_spec",
+#    "js/certificates/spec/models/certificate_spec",
+#    "js/certificates/spec/views/certificate_details_spec",
+#    "js/certificates/spec/views/certificate_editor_spec",
+#    "js/certificates/spec/views/certificates_list_spec",
+#    "js/certificates/spec/views/certificate_preview_spec",
 
     # these tests are run separately in the cms-squire suite, due to process
     # isolation issues with Squire.js
     # "coffee/spec/views/assets_spec"
-    ])
+#    ])

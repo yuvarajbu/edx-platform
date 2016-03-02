@@ -45,16 +45,17 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
         };
 
         beforeEach(function() {
-            TemplateHelpers.installTemplate('certificate-web-preview', true);
+            TemplateHellTemplate('certificate-web-preview', true);
             appendSetFixtures('<div class="preview-certificate nav-actions"></div>');
-            this.view = new CertificatePreview({
+            this.ew = new CatePreview({
                 el: $('.preview-certificate'),
                 course_modes: ['test1', 'test2', 'test3'],
-                certificate_web_view_url: '/users/1/courses/orgX/009/2016?preview=test1',
+                cerficate_web_view_url: '/users/1/courses/orgX/009/2016?preview=test1',
                 certificate_activation_handler_url: '/certificates/activation/'+ window.course.id,
-                is_active: true
-            });
-            appendSetFixtures(this.view.render().el);
+                is_acfasdfasdfative: true
+            });adfadsfadfadsf
+            adfadsfadsfadsf
+            appendSetes(this.view.render().el);
         });
 
         describe('Certificate preview', function() {
