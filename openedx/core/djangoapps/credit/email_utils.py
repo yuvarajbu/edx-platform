@@ -21,10 +21,11 @@ from django.utils.translation import ugettext as _
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from eventtracking import tracker
-
 from edxmako.shortcuts import render_to_string
 from edxmako.template import Template
 from microsite_configuration import microsite
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.credit.models import CreditProvider, CreditApiConfig
 from xmodule.modulestore.django import modulestore
 
 
@@ -67,6 +68,26 @@ def send_credit_notifications(username, course_key):
         # strip enclosing angle brackets from 'logo_image' cache 'Content-ID'
         logo_image_id = logo_image.get('Content-ID', '')[1:-1]
 
+    providers = get_credit_providers_by_course(user, course_key)
+    providers_string = None
+    if providers:
+        if len(providers) > 1:
+            if len(providers) > 2:
+                # Translators: The join of three or more university names. The first of these formatting strings
+                # represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
+                providers_string = _("{first_providers}, and {last_provider}").format(
+                    first_providers=u", ".join(providers[:-1]),
+                    last_provider=providers[-1]
+                )
+            else:
+                # Translators: The join of two university names (e.g., Harvard and MIT).
+                providers_string = _("{first_provider} and {second_provider}").format(
+                    first_provider=providers[0],
+                    second_provider=providers[1]
+                )
+        else:
+            providers_string = providers[0]
+
     context = {
         'full_name': user.get_full_name(),
         'platform_name': settings.PLATFORM_NAME,
@@ -75,6 +96,7 @@ def send_credit_notifications(username, course_key):
         'dashboard_link': dashboard_link,
         'credit_course_link': credit_course_link,
         'tracking_pixel': tracking_pixel,
+        'providers': providers_string if providers else None,
     }
 
     # create the root email message
@@ -85,6 +107,10 @@ def send_credit_notifications(username, course_key):
     notification_msg.attach(msg_alternative)
     # render the credit notification templates
     subject = _(u'Course Credit Eligibility')
+    if providers:
+        subject = _(u'You are eligible for credit from {providers_string}').format(
+            providers_string=providers_string
+        )
 
     # add alternative plain text message
     email_body_plain = render_to_string('credit_notifications/credit_eligibility_email.txt', context)
@@ -180,3 +206,60 @@ def _email_url_parser(url_name, extra_param=None):
     dashboard_url_path = reverse(url_name) + extra_param if extra_param else reverse(url_name)
     dashboard_link_parts = ("https", site_name, dashboard_url_path, '', '', '')
     return urlparse.urlunparse(dashboard_link_parts)
+
+
+def get_credit_providers_by_course(user, course_key):
+    """Get the course information from ecommerce and parse the data to get providers.
+
+    Arguments:
+        user (User): The user object.
+        course_key (CourseKey): The identifier for the course.
+
+    Returns:
+        list, containing course providers.
+    """
+    credit_config = CreditApiConfig.current()
+
+    # Bypass caching for staff users, who may be adding providers and want
+    # to see them immediately.
+
+    providers_data = None
+    cache_key = None
+    if credit_config.enabled:
+        cache_key = '{key_prefix}.{course_key}'.format(
+            key_prefix=credit_config.CACHE_KEY, course_key=unicode(course_key)
+        )
+        providers_data = cache.get(cache_key)
+
+    if providers_data is not None:
+        return providers_data
+
+    providers_data = []
+    try:
+        response = ecommerce_api_client(user).courses(unicode(course_key) + '/?include_products=1').get()
+    except Exception:  # pylint: disable=broad-except
+        log.exception("Failed to receive data from the ecommerce course API for Course ID '%s'.", unicode(course_key))
+        return
+
+    if not response:
+        log.debug("No Course information found from ecommerce API for Course ID '%s'.", unicode(course_key))
+        return
+
+    for product in response.get('products'):
+        providers_data.extend(
+            [attr.get('value') for attr in product.get('attribute_values') if attr.get('name') == 'credit_provider']
+        )
+
+    # Hit the CreditProvider method to get the all active providers with complete information.
+    providers_information = CreditProvider.get_credit_providers()
+
+    providers_display_names = []
+    for provider_id in providers_data:
+        providers_display_names.extend(
+            [provider['display_name'] for provider in providers_information if provider['id'] == provider_id]
+        )
+
+    if cache_key:
+        cache.set(cache_key, providers_display_names, credit_config.cache_ttl)
+
+    return providers_display_names
