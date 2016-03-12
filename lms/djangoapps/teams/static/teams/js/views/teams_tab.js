@@ -133,7 +133,7 @@
 
                     this.mainView = this.tabbedView = this.createViewWithHeader({
                         title: gettext("Teams"),
-                        description: gettext("See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are."),
+                        description: gettext("See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are."),  // jshint ignore:line
                         mainView: new TeamsTabbedView({
                             tabs: [{
                                 title: gettext('My Team'),
@@ -245,7 +245,7 @@
                         view.mainView = view.createViewWithHeader({
                             topic: topic,
                             title: gettext("Create a New Team"),
-                            description: gettext("Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know."),
+                            description: gettext("Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know."),  // jshint ignore:line
                             breadcrumbs: view.createBreadcrumbs(topic),
                             mainView: new TeamEditView({
                                 action: 'create',
@@ -279,7 +279,7 @@
                         });
                         editViewWithHeader = self.createViewWithHeader({
                             title: gettext("Edit Team"),
-                            description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),
+                            description: gettext("If you make significant changes, make sure you notify members of the team before making these changes."),  // jshint ignore:line
                             breadcrumbs: self.createBreadcrumbs(topic, team),
                             mainView: view,
                             topic: topic,
@@ -308,7 +308,7 @@
                                 mainView: view,
                                 breadcrumbs: self.createBreadcrumbs(topic, team),
                                 title: gettext("Membership"),
-                                description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),
+                                description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),  // jshint ignore:line
                                 topic: topic,
                                 team: team
                             }
