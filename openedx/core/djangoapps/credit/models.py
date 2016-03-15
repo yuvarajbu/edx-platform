@@ -710,11 +710,8 @@ class CreditRequest(TimeStampedModel):
         )
 
 
-class CreditApiConfig(ConfigurationModel):
-    """
-    Manages configuration for connecting to the commerce service and using its
-    API.
-    """
+class CreditConfig(ConfigurationModel):
+    """ Manage credit configuration """
     CACHE_KEY = 'credit.providers.api.data'
 
     cache_ttl = models.PositiveIntegerField(
@@ -732,4 +729,4 @@ class CreditApiConfig(ConfigurationModel):
 
     def __unicode__(self):
         """Unicode representation of the config. """
-        return u'{}'.format(self.id)
+        return 'Credit Configuration'

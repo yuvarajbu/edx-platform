@@ -25,7 +25,7 @@ from edxmako.shortcuts import render_to_string
 from edxmako.template import Template
 from microsite_configuration import microsite
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
-from openedx.core.djangoapps.credit.models import CreditProvider, CreditApiConfig
+from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider
 from xmodule.modulestore.django import modulestore
 
 
@@ -218,7 +218,7 @@ def get_credit_providers_by_course(user, course_key):
     Returns:
         list, containing course providers.
     """
-    credit_config = CreditApiConfig.current()
+    credit_config = CreditConfig.current()
 
     # Bypass caching for staff users, who may be adding providers and want
     # to see them immediately.

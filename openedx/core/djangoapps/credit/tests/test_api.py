@@ -27,7 +27,7 @@ from openedx.core.djangoapps.credit.exceptions import (
     CreditRequestNotFound,
 )
 from openedx.core.djangoapps.credit.models import (
-    CreditApiConfig,
+    CreditConfig,
     CreditCourse,
     CreditProvider,
     CreditRequirement,
@@ -493,7 +493,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         """ Test the credit requirements, eligibility notification, email
         content caching for a credit course.
         """
-        self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE, 200)
+        self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
 
         # Configure a course with two credit requirements
         self.add_credit_course()
@@ -1081,7 +1081,7 @@ class CourseApiTests(CreditApiTestBase):
         super(CourseApiTests, self).setUp()
         self.user = UserFactory()
         self.add_credit_course(self.course_key)
-        self.credit_config = CreditApiConfig(cache_ttl=100, enabled=True)
+        self.credit_config = CreditConfig(cache_ttl=100, enabled=True)
         self.credit_config.save()
 
         # Add another provider.
@@ -1100,7 +1100,7 @@ class CourseApiTests(CreditApiTestBase):
     def test_get_credit_providers_method(self):
         """Verify that parsed providers list is returns after getting course production information."""
         user = UserFactory.create()
-        self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE, 200)
+        self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
         response_providers = get_credit_providers_by_course(user, self.course_key)
         self.assertEqual(self.PROVIDERS_LIST, response_providers)
 
@@ -1116,7 +1116,7 @@ class CourseApiTests(CreditApiTestBase):
     @httpretty.activate
     def test_get_credit_providers_caching(self):
         """Verify that providers list is cached."""
-        self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE, 200)
+        self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
         user = UserFactory.create()
         # Warm up the cache.
         response_providers = get_credit_providers_by_course(user, self.course_key)
@@ -1129,32 +1129,21 @@ class CourseApiTests(CreditApiTestBase):
         # Verify only one request was made.
         self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
 
-        # # Hit the api with clearing cache.
-        for __ in range(3):
-            # clear the cache to see that each time api is hit.
-            cache.clear()
-            get_credit_providers_by_course(self.user, self.course_key)
-
-        self.assertEqual(len(httpretty.httpretty.latest_requests), 4)
-
     @httpretty.activate
     def test_get_credit_providers_without_caching(self):
-        """Verify that providers list is cached."""
+        """Verify that providers list is not cached."""
         self.credit_config.cache_ttl = 0
         self.credit_config.save()
 
-        self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE, 200)
+        self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
         user = UserFactory.create()
 
-        # Warm up the cache.
         response_providers = get_credit_providers_by_course(user, self.course_key)
         self.assertEqual(self.PROVIDERS_LIST, response_providers)
 
-        # Hit the cache.
         response_providers = get_credit_providers_by_course(user, self.course_key)
         self.assertEqual(self.PROVIDERS_LIST, response_providers)
 
-        # Verify only one request was made.
         self.assertEqual(len(httpretty.httpretty.latest_requests), 2)
 
     @httpretty.activate
@@ -1189,7 +1178,7 @@ class CourseApiTests(CreditApiTestBase):
     @ddt.unpack
     def test_get_provider_api_with_multiple_data(self, data, expected_data):
         user = UserFactory.create()
-        self._mock_ecommerce_courses_api(self.course_key, data, 200)
+        self._mock_ecommerce_courses_api(self.course_key, data)
 
         response_providers = get_credit_providers_by_course(user, self.course_key)
         self.assertEqual(expected_data, response_providers)
