@@ -5,6 +5,7 @@ import datetime
 import logging
 import uuid
 import json
+from openedx.core.djangoapps.credit.api import get_credit_providers
 import warnings
 from collections import defaultdict
 from urlparse import urljoin
@@ -720,6 +721,7 @@ def dashboard(request):
         'all_course_modes': course_mode_info,
         'cert_statuses': cert_statuses,
         'credit_statuses': _credit_statuses(user, course_enrollments),
+        'credit_provider': get_credit_providers(user, course_id),
         'show_email_settings_for': show_email_settings_for,
         'reverifications': reverifications,
         'verification_status': verification_status,
