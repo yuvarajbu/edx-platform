@@ -8,7 +8,6 @@ import unittest
 import ddt
 from django.conf import settings
 from django.core import mail
-from django.core.cache import cache
 from django.test.utils import override_settings
 from django.db import connection
 import httpretty
