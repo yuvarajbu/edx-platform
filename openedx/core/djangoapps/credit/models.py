@@ -725,7 +725,7 @@ class CreditConfig(ConfigurationModel):
     @property
     def is_cache_enabled(self):
         """Whether responses from the commerce API will be cached."""
-        return self.cache_ttl > 0
+        return self.enabled and self.cache_ttl > 0
 
     def __unicode__(self):
         """Unicode representation of the config. """

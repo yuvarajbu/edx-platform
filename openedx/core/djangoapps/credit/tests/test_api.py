@@ -1110,11 +1110,12 @@ class CourseApiTests(CreditApiTestBase):
         mock_init.side_effect = Exception
         response = get_credit_providers_by_course(self.user, self.course_key)
         self.assertTrue(mock_init.called)
-        self.assertEqual(response, None)
+        self.assertEqual(response, [])
 
     @httpretty.activate
     def test_get_credit_providers_caching(self):
         """Verify that providers list is cached."""
+        self.assertTrue(self.credit_config.is_cache_enabled)
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
         user = UserFactory.create()
         # Warm up the cache.
@@ -1133,6 +1134,7 @@ class CourseApiTests(CreditApiTestBase):
         """Verify that providers list is not cached."""
         self.credit_config.cache_ttl = 0
         self.credit_config.save()
+        self.assertFalse(self.credit_config.is_cache_enabled)
 
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
         user = UserFactory.create()
@@ -1147,7 +1149,7 @@ class CourseApiTests(CreditApiTestBase):
 
     @httpretty.activate
     @ddt.data(
-        (None, None),
+        (None, []),
         ({'products': []}, []),
         (
             {
@@ -1178,6 +1180,5 @@ class CourseApiTests(CreditApiTestBase):
     def test_get_provider_api_with_multiple_data(self, data, expected_data):
         user = UserFactory.create()
         self._mock_ecommerce_courses_api(self.course_key, data)
-
         response_providers = get_credit_providers_by_course(user, self.course_key)
         self.assertEqual(expected_data, response_providers)

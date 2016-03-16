@@ -96,7 +96,7 @@ def send_credit_notifications(username, course_key):
         'dashboard_link': dashboard_link,
         'credit_course_link': credit_course_link,
         'tracking_pixel': tracking_pixel,
-        'providers': providers_string if providers else None,
+        'providers': providers_string,
     }
 
     # create the root email message
@@ -220,12 +220,9 @@ def get_credit_providers_by_course(user, course_key):
     """
     credit_config = CreditConfig.current()
 
-    # Bypass caching for staff users, who may be adding providers and want
-    # to see them immediately.
-
     providers_data = None
     cache_key = None
-    if credit_config.enabled:
+    if credit_config.is_cache_enabled:
         cache_key = '{key_prefix}.{course_key}'.format(
             key_prefix=credit_config.CACHE_KEY, course_key=unicode(course_key)
         )
@@ -235,31 +232,31 @@ def get_credit_providers_by_course(user, course_key):
         return providers_data
 
     providers_data = []
+
     try:
         response = ecommerce_api_client(user).courses(unicode(course_key) + '/?include_products=1').get()
     except Exception:  # pylint: disable=broad-except
         log.exception("Failed to receive data from the ecommerce course API for Course ID '%s'.", unicode(course_key))
-        return
+        return providers_data
 
     if not response:
         log.debug("No Course information found from ecommerce API for Course ID '%s'.", unicode(course_key))
-        return
+        return providers_data
 
     for product in response.get('products'):
-        providers_data.extend(
-            [attr.get('value') for attr in product.get('attribute_values') if attr.get('name') == 'credit_provider']
-        )
+        providers_data += [
+            attr.get('value') for attr in product.get('attribute_values') if attr.get('name') == 'credit_provider'
+        ]
 
     # Hit the CreditProvider method to get the all active providers with complete information.
     providers_information = CreditProvider.get_credit_providers()
-
     providers_display_names = []
     for provider_id in providers_data:
-        providers_display_names.extend(
-            [provider['display_name'] for provider in providers_information if provider['id'] == provider_id]
-        )
+        providers_display_names += [
+            provider['display_name'] for provider in providers_information if provider['id'] == provider_id
+        ]
 
-    if cache_key:
+    if credit_config.is_cache_enabled:
         cache.set(cache_key, providers_display_names, credit_config.cache_ttl)
 
     return providers_display_names
