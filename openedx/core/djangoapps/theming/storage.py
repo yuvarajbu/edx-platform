@@ -7,9 +7,12 @@ import os.path
 import re
 
 from django.core.exceptions import ImproperlyConfigured
-from django.contrib.staticfiles.storage import StaticFilesStorage
+from django.contrib.staticfiles.storage import StaticFilesStorage, CachedFilesMixin
 from django.utils._os import safe_join
 from django.conf import settings
+from django.utils.six.moves.urllib.parse import (  # pylint: disable=no-name-in-module, import-error
+    unquote, urlsplit,
+)
 
 from openedx.core.djangoapps.theming.helpers import (
     get_base_theme_dir,
@@ -18,14 +21,14 @@ from openedx.core.djangoapps.theming.helpers import (
 )
 
 
-class ComprehensiveThemingStorage(StaticFilesStorage):
+class ComprehensiveThemingStorageMixin(object):
     """
     Mixin for Django storage system to make it aware of the currently-active
     comprehensive theme, so that it can generate theme-scoped URLs for themed
     static assets.
     """
     def __init__(self, *args, **kwargs):
-        super(ComprehensiveThemingStorage, self).__init__(*args, **kwargs)
+        super(ComprehensiveThemingStorageMixin, self).__init__(*args, **kwargs)
         themes_dir = get_base_theme_dir()
         if not themes_dir:
             self.themes_location = None
@@ -81,4 +84,40 @@ class ComprehensiveThemingStorage(StaticFilesStorage):
         theme_dir = get_current_site_theme_dir()
         if self.themed(name, theme_dir):
             name = theme_dir + "/" + name
-        return super(ComprehensiveThemingStorage, self).url(name)
+        return super(ComprehensiveThemingStorageMixin, self).url(name)
+
+
+class ComprehensiveThemingCachedFilesMixin(CachedFilesMixin):
+    """
+    Comprehensive theming aware CachedFilesMixin.
+    """
+
+    def url(self, name, force=False):
+        """
+        Returns themed url for the given asset.
+        """
+        parsed_name = urlsplit(unquote(name))
+        clean_name = parsed_name.path.strip()
+        pattern = r"/?(?P<theme>[^/]+)/(?P<system>lms|cms)/static/"
+        asset_name = name
+        if not self.exists(clean_name):
+            # remove 'lms/static' from url to get correct asset path inside theme directory
+            asset_name = re.sub(pattern, r"\g<theme>/", name)
+            parsed_name = urlsplit(unquote(name))
+            clean_name = parsed_name.path.strip()
+
+            # if themed asset does not exists then use default asset
+            if not self.exists(clean_name):
+                asset_name = re.sub(pattern, r"", name)
+        return super(ComprehensiveThemingCachedFilesMixin, self).url(asset_name, force)
+
+
+class ComprehensiveThemingStorage(
+        ComprehensiveThemingStorageMixin,
+        StaticFilesStorage,
+):
+    """
+    Used by the ComprehensiveThemeFinder class. Mixes in support for cached
+    files and comprehensive theming in static files.
+    """
+    pass
