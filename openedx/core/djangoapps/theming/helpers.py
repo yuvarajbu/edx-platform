@@ -10,6 +10,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.db import transaction
 
 from microsite_configuration import microsite
 from microsite_configuration import page_title_breadcrumbs
@@ -193,7 +194,8 @@ def get_current_site_theme_dir():
         return None
 
     try:
-        site = get_current_site(request)
+        with transaction.atomic():
+            site = get_current_site(request)
     except Site.DoesNotExist:
         return None
     site_theme_dir = cache.get(get_site_theme_cache_key(site))
