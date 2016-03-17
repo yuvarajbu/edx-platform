@@ -24,7 +24,7 @@ from eventtracking import tracker
 from edxmako.shortcuts import render_to_string
 from edxmako.template import Template
 from microsite_configuration import microsite
-from openedx.core.djangoapps.commerce.utils import ecommerce_api_client_service_user
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider
 from xmodule.modulestore.django import modulestore
 
@@ -234,7 +234,7 @@ def get_credit_providers_by_course(course_key):
 
     try:
         user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
-        response = ecommerce_api_client_service_user(user).courses(unicode(course_key) + '/?include_products=1').get()
+        response = ecommerce_api_client(user).courses(unicode(course_key)).get(include_products='1')
     except Exception:  # pylint: disable=broad-except
         log.exception("Failed to receive data from the ecommerce course API for Course ID '%s'.", unicode(course_key))
         return providers_data

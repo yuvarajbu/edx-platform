@@ -33,14 +33,14 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirementStatus,
     CreditEligibility
 )
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, UserFactoryNoProfile
 from util.date_utils import from_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
-TEST_ECOM_WORKER = 'test_worker'
+TEST_ECOMMERCE_WORKER = 'test_worker'
 
 
 @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
@@ -491,14 +491,15 @@ class CreditRequirementApiTests(CreditApiTestBase):
     @override_settings(
         ECOMMERCE_API_URL=TEST_API_URL,
         ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
-        ECOMMERCE_SERVICE_WORKER_USERNAME=TEST_ECOM_WORKER
+        ECOMMERCE_SERVICE_WORKER_USERNAME=TEST_ECOMMERCE_WORKER
     )
     def test_satisfy_all_requirements(self):
         """ Test the credit requirements, eligibility notification, email
         content caching for a credit course.
         """
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
-        UserFactory(username=TEST_ECOM_WORKER)
+        worker_user = UserFactoryNoProfile(username=TEST_ECOMMERCE_WORKER)
+        self.assertFalse(hasattr(worker_user, 'profile'))
 
         # Configure a course with two credit requirements
         self.add_credit_course()
@@ -537,7 +538,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertFalse(api.is_user_eligible_for_credit("bob", self.course_key))
 
         # Satisfy the other requirement
-        with self.assertNumQueries(18):
+        with self.assertNumQueries(19):
             api.set_credit_requirement_status(
                 "bob",
                 self.course_key,
@@ -591,7 +592,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Delete the eligibility entries and satisfy the user's eligibility
         # requirement again to trigger eligibility notification
         CreditEligibility.objects.all().delete()
-        with self.assertNumQueries(14):
+        with self.assertNumQueries(15):
             api.set_credit_requirement_status(
                 "bob",
                 self.course_key,
@@ -1081,14 +1082,14 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
 @override_settings(
     ECOMMERCE_API_URL=TEST_API_URL,
     ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
-    ECOMMERCE_SERVICE_WORKER_USERNAME=TEST_ECOM_WORKER
+    ECOMMERCE_SERVICE_WORKER_USERNAME=TEST_ECOMMERCE_WORKER
 )
 @ddt.ddt
 class CourseApiTests(CreditApiTestBase):
     """Test Python API for course product information."""
     def setUp(self):
         super(CourseApiTests, self).setUp()
-        UserFactory(username=TEST_ECOM_WORKER)
+        self.workeruser = UserFactoryNoProfile(username=TEST_ECOMMERCE_WORKER)
         self.add_credit_course(self.course_key)
         self.credit_config = CreditConfig(cache_ttl=100, enabled=True)
         self.credit_config.save()
@@ -1104,11 +1105,11 @@ class CourseApiTests(CreditApiTestBase):
             fulfillment_instructions=self.FULFILLMENT_INSTRUCTIONS,
             thumbnail_url=self.THUMBNAIL_URL
         )
+        self.assertFalse(hasattr(self.workeruser, 'profile'))
 
     @httpretty.activate
     def test_get_credit_providers_method(self):
         """Verify that parsed providers list is returns after getting course production information."""
-        user = UserFactory.create()
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
         response_providers = get_credit_providers_by_course(self.course_key)
         self.assertEqual(self.PROVIDERS_LIST, response_providers)
