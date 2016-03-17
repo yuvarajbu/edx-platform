@@ -2,12 +2,10 @@
     Helpers for accessing comprehensive theming related variables.
 """
 import re
-import os.path
+import os
 from path import Path
 
-from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
-from django.contrib.sites.models import Site
+from django.conf import settings, ImproperlyConfigured
 from django.core.cache import cache
 from django.contrib.staticfiles.storage import staticfiles_storage
 
@@ -172,6 +170,25 @@ def strip_site_theme_templates_path(uri):
     return uri
 
 
+def get_current_site():
+    """
+    Return current site.
+
+    Returns:
+         (django.contrib.sites.models.Site): theme directory for current site
+    """
+    from edxmako.middleware import REQUEST_CONTEXT
+    request = getattr(REQUEST_CONTEXT, 'request', None)
+    if not request:
+        return None
+
+    # if hostname is not valid
+    if not all((isinstance(request.get_host(), basestring), is_valid_hostname(request.get_host()))):
+        return None
+
+    return request.site
+
+
 def get_current_site_theme_dir():
     """
     Return theme directory for the current site.
@@ -183,19 +200,7 @@ def get_current_site_theme_dir():
     Returns:
          (str): theme directory for current site
     """
-    from edxmako.middleware import REQUEST_CONTEXT
-    request = getattr(REQUEST_CONTEXT, 'request', None)
-    if not request:
-        return None
-
-    # if hostname is not valid
-    if not all((isinstance(request.get_host(), basestring), is_valid_hostname(request.get_host()))):
-        return None
-
-    try:
-        site = get_current_site(request)
-    except Site.DoesNotExist:
-        return None
+    site = get_current_site()
     site_theme_dir = cache.get(get_site_theme_cache_key(site))
 
     # if site theme dir is not in cache and comprehensive theming is enabled then pull it from db.
@@ -236,9 +241,12 @@ def get_base_theme_dir():
         '/edx/app/edxapp/edx-platform/themes'
 
     Returns:
-         (str): Base theme directory
+         (Path): Base theme directory path
     """
-    return settings.COMPREHENSIVE_THEME_DIR
+    themes_dir = settings.COMPREHENSIVE_THEME_DIR
+    if not isinstance(themes_dir, basestring):
+        raise ImproperlyConfigured("COMPREHENSIVE_THEME_DIR must be a string.")
+    return Path(themes_dir)
 
 
 def is_comprehensive_theming_enabled():
@@ -319,7 +327,7 @@ def get_static_file_url(asset):
     Returns url of the themed asset if asset is not themed than returns the default asset url.
 
     Example:
-        >> get_static_file_url('css/lms-main.css', 'red-theme')
+        >> get_static_file_url('css/lms-main.css')
         '/static/red-theme/css/lms-main.css'
 
     Parameters:
@@ -328,9 +336,74 @@ def get_static_file_url(asset):
     Returns:
         (str): static asset's url
     """
-    theme = get_current_site_theme_dir()
-    try:
-        return staticfiles_storage.url(asset, theme)
-    except (ValueError, TypeError):
-        # in case of an error return url without theme applied
-        return staticfiles_storage.url(asset)
+    return staticfiles_storage.url(asset)
+
+
+def get_themes():
+    """
+    get a list of all themes known to the system.
+    Returns:
+        list of themes known to the system.
+    """
+    themes_dir = get_base_theme_dir()
+    # pick only directories and discard files in themes directory
+    theme_names = []
+    if themes_dir:
+        theme_names = [_dir for _dir in os.listdir(themes_dir) if is_theme_dir(themes_dir / _dir)]
+
+    return [Theme(name, name) for name in theme_names]
+
+
+def is_theme_dir(_dir):
+    """
+    Returns true if given dir contains theme overrides.
+    A theme dir must have subdirectory 'lms' or 'cms' or both.
+
+    Args:
+        _dir: directory path to check for a theme
+
+    Returns:
+        Returns true if given dir is a theme directory.
+    """
+    theme_sub_directories = {'lms', 'cms'}
+    return bool(os.path.isdir(_dir) and theme_sub_directories.intersection(os.listdir(_dir)))
+
+
+class Theme(object):
+    """
+    class to encapsulate theme related information.
+    """
+    name = ''
+    theme_dir = ''
+    path = ''
+
+    def __init__(self, name='', theme_dir=''):
+        """
+        init method for Theme
+        Args:
+            name: name if the theme
+            theme_dir: directory name of the theme
+        """
+        self.name = name
+        self.theme_dir = theme_dir
+        self.path = Path(get_base_theme_dir()) / theme_dir / get_project_root_name()
+
+    def __eq__(self, other):
+        """
+        Returns True if given theme is same as the self
+        Args:
+            other: Theme object to compare with self
+
+        Returns:
+            (bool) True if two themes are the same else False
+        """
+        return (self.theme_dir, self.path) == (other.theme_dir, other.path)
+
+    def __hash__(self):
+        return hash((self.theme_dir, self.path))
+
+    def __unicode__(self):
+        return u"<Theme: {name} at '{path}'>".format(name=self.name, path=self.path)
+
+    def __repr__(self):
+        return self.__unicode__()

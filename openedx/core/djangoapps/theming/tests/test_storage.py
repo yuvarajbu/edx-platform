@@ -7,11 +7,11 @@ import re
 
 from mock import patch
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.conf import settings
 
 from openedx.core.djangoapps.theming.helpers import get_base_theme_dir
-from openedx.core.djangoapps.theming.storage import ComprehensiveThemingStorage
+from openedx.core.djangoapps.theming.storage import ThemeStorage
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -26,8 +26,9 @@ class TestStorageLMS(TestCase):
         self.themes_dir = get_base_theme_dir()
         self.enabled_theme = "red-theme"
         self.system_dir = settings.REPO_ROOT / "lms"
-        self.storage = ComprehensiveThemingStorage(location=self.themes_dir)
+        self.storage = ThemeStorage(location=self.themes_dir / self.enabled_theme / 'lms' / 'static')
 
+    @override_settings(DEBUG=True)
     @ddt.data(
         (True, "images/logo.png"),
         (True, "images/favicon.ico"),
@@ -40,6 +41,7 @@ class TestStorageLMS(TestCase):
         """
         self.assertEqual(is_themed, self.storage.themed(asset, self.enabled_theme))
 
+    @override_settings(DEBUG=True)
     @ddt.data(
         ("images/logo.png", ),
         ("images/favicon.ico", ),
@@ -60,6 +62,7 @@ class TestStorageLMS(TestCase):
 
             self.assertEqual(asset_url, expected_url)
 
+    @override_settings(DEBUG=True)
     @ddt.data(
         ("images/logo.png", ),
         ("images/favicon.ico", ),
@@ -73,11 +76,7 @@ class TestStorageLMS(TestCase):
             "openedx.core.djangoapps.theming.storage.get_current_site_theme_dir",
             return_value=self.enabled_theme,
         ):
-            asset_url = self.storage.url(asset)
-            asset_url = asset_url.replace(self.storage.base_url, "")
-            # remove hash key from file url
-            asset_url = re.sub(r"(\.\w+)(\.png|\.ico)$", r"\g<2>", asset_url)
-            returned_path = self.storage.path(asset_url)
+            returned_path = self.storage.path(asset)
             expected_path = self.themes_dir / self.enabled_theme / "lms/static/" / asset
 
             self.assertEqual(expected_path, returned_path)

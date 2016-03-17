@@ -87,7 +87,7 @@ class TestComprehensiveTheming(TestCase):
 
     @with_comprehensive_theme('red-theme')
     def test_overridden_logo_image(self):
-        result = staticfiles.finders.find('red-theme/lms/static/images/logo.png')
+        result = staticfiles.finders.find('red-theme/images/logo.png')
         self.assertEqual(result, settings.REPO_ROOT / 'themes/red-theme/lms/static/images/logo.png')
 
     def test_default_favicon(self):
@@ -102,7 +102,7 @@ class TestComprehensiveTheming(TestCase):
         """
         Test that static files finders are adjusted according to the applied comprehensive theme.
         """
-        result = staticfiles.finders.find('red-theme/lms/static/css/lms-main.css')
+        result = staticfiles.finders.find('red-theme/css/lms-main.css')
         self.assertEqual(result, settings.REPO_ROOT / "themes/red-theme/lms/static/css/lms-main.css")
 
         lms_main_css = ""
@@ -129,7 +129,7 @@ class TestComprehensiveTheming(TestCase):
         """
         Test comprehensive theme override on favicon image.
         """
-        result = staticfiles.finders.find('red-theme/lms/static/images/favicon.ico')
+        result = staticfiles.finders.find('red-theme/images/favicon.ico')
         self.assertEqual(result, settings.REPO_ROOT / 'themes/red-theme/lms/static/images/favicon.ico')
 
 

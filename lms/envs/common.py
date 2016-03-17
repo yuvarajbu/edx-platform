@@ -1155,6 +1155,9 @@ MIDDLEWARE_CLASSES = (
 
     # This must be last
     'microsite_configuration.middleware.MicrositeSessionCookieDomainMiddleware',
+
+    # django current site middleware with default site
+    'django_sites_extensions.middleware.CurrentSiteWithDefaultMiddleware',
 )
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
@@ -1172,7 +1175,7 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
+    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
@@ -2810,3 +2813,6 @@ CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "request_cache.middleware.RequestCache"
+
+# Dafault site id to use in case there is no site that matches with the request headers.
+DEFAULT_SITE_ID = 1

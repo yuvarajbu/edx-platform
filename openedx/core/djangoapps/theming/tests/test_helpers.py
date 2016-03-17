@@ -2,20 +2,45 @@
 import unittest
 from mock import patch
 
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, override_settings
 from django.conf import settings
 
 from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.theming.helpers import get_template_path_with_theme, strip_site_theme_templates_path, \
-    get_current_site_theme_dir
+    get_current_site_theme_dir, get_themes, Theme
+
+
+class TestHelpers(TestCase):
+    """Test comprehensive theming helper functions."""
+
+    def test_get_themes(self):
+        """
+        Tests template paths are returned from enabled theme.
+        """
+        expected_themes = [
+            Theme('red-theme', 'red-theme'),
+            Theme('edge.edx.org', 'edge.edx.org'),
+            Theme('edx.org', 'edx.org'),
+            Theme('stanford-style', 'stanford-style'),
+        ]
+        actual_themes = get_themes()
+        self.assertItemsEqual(expected_themes, actual_themes)
+
+    @override_settings(COMPREHENSIVE_THEME_DIR=settings.TEST_THEME.dirname())
+    def test_get_themes_2(self):
+        """
+        Tests template paths are returned from enabled theme.
+        """
+        expected_themes = [
+            Theme('test-theme', 'test-theme'),
+        ]
+        actual_themes = get_themes()
+        self.assertItemsEqual(expected_themes, actual_themes)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestHelpersLMS(TestCase):
     """Test comprehensive theming helper functions."""
-
-    def setUp(self):
-        super(TestHelpersLMS, self).setUp()
 
     @with_comprehensive_theme('red-theme')
     def test_get_template_path_with_theme_enabled(self):
@@ -73,9 +98,6 @@ class TestHelpersLMS(TestCase):
 @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
 class TestHelpersCMS(TestCase):
     """Test comprehensive theming helper functions."""
-
-    def setUp(self):
-        super(TestHelpersCMS, self).setUp()
 
     @with_comprehensive_theme('red-theme')
     def test_get_template_path_with_theme_enabled(self):

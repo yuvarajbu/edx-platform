@@ -61,7 +61,10 @@ from lms.envs.common import (
     # Django REST framework configuration
     REST_FRAMEWORK,
 
-    STATICI18N_OUTPUT_DIR
+    STATICI18N_OUTPUT_DIR,
+
+    # Dafault site id to use in case there is no site that matches with the request headers.
+    DEFAULT_SITE_ID,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -355,6 +358,9 @@ MIDDLEWARE_CLASSES = (
 
     # use Django built in clickjacking protection
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # django current site middleware with default site
+    'django_sites_extensions.middleware.CurrentSiteWithDefaultMiddleware',
 )
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
@@ -512,7 +518,7 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
-    'openedx.core.djangoapps.theming.finders.ComprehensiveThemeFinder',
+    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
