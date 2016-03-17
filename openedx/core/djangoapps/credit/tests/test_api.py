@@ -40,6 +40,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
+TEST_ECOM_WORKER = 'test_worker'
 
 
 @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
@@ -487,12 +488,17 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertEqual(len(req_status), 0)
 
     @httpretty.activate
-    @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+    @override_settings(
+        ECOMMERCE_API_URL=TEST_API_URL,
+        ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
+        ECOMMERCE_SERVICE_WORKER_USERNAME=TEST_ECOM_WORKER
+    )
     def test_satisfy_all_requirements(self):
         """ Test the credit requirements, eligibility notification, email
         content caching for a credit course.
         """
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
+        UserFactory(username=TEST_ECOM_WORKER)
 
         # Configure a course with two credit requirements
         self.add_credit_course()
@@ -1072,13 +1078,17 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
-@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+@override_settings(
+    ECOMMERCE_API_URL=TEST_API_URL,
+    ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
+    ECOMMERCE_SERVICE_WORKER_USERNAME=TEST_ECOM_WORKER
+)
 @ddt.ddt
 class CourseApiTests(CreditApiTestBase):
     """Test Python API for course product information."""
     def setUp(self):
         super(CourseApiTests, self).setUp()
-        self.user = UserFactory()
+        UserFactory(username=TEST_ECOM_WORKER)
         self.add_credit_course(self.course_key)
         self.credit_config = CreditConfig(cache_ttl=100, enabled=True)
         self.credit_config.save()
@@ -1100,7 +1110,7 @@ class CourseApiTests(CreditApiTestBase):
         """Verify that parsed providers list is returns after getting course production information."""
         user = UserFactory.create()
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
-        response_providers = get_credit_providers_by_course(user, self.course_key)
+        response_providers = get_credit_providers_by_course(self.course_key)
         self.assertEqual(self.PROVIDERS_LIST, response_providers)
 
     @httpretty.activate
@@ -1108,7 +1118,7 @@ class CourseApiTests(CreditApiTestBase):
     def test_get_credit_providers_method_with_exception(self, mock_init):
         """Verify that in case of any exception it logs the error and return."""
         mock_init.side_effect = Exception
-        response = get_credit_providers_by_course(self.user, self.course_key)
+        response = get_credit_providers_by_course(self.course_key)
         self.assertTrue(mock_init.called)
         self.assertEqual(response, [])
 
@@ -1117,13 +1127,13 @@ class CourseApiTests(CreditApiTestBase):
         """Verify that providers list is cached."""
         self.assertTrue(self.credit_config.is_cache_enabled)
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
-        user = UserFactory.create()
+
         # Warm up the cache.
-        response_providers = get_credit_providers_by_course(user, self.course_key)
+        response_providers = get_credit_providers_by_course(self.course_key)
         self.assertEqual(self.PROVIDERS_LIST, response_providers)
 
         # Hit the cache.
-        response_providers = get_credit_providers_by_course(user, self.course_key)
+        response_providers = get_credit_providers_by_course(self.course_key)
         self.assertEqual(self.PROVIDERS_LIST, response_providers)
 
         # Verify only one request was made.
@@ -1137,12 +1147,11 @@ class CourseApiTests(CreditApiTestBase):
         self.assertFalse(self.credit_config.is_cache_enabled)
 
         self._mock_ecommerce_courses_api(self.course_key, self.COURSE_API_RESPONSE)
-        user = UserFactory.create()
 
-        response_providers = get_credit_providers_by_course(user, self.course_key)
+        response_providers = get_credit_providers_by_course(self.course_key)
         self.assertEqual(self.PROVIDERS_LIST, response_providers)
 
-        response_providers = get_credit_providers_by_course(user, self.course_key)
+        response_providers = get_credit_providers_by_course(self.course_key)
         self.assertEqual(self.PROVIDERS_LIST, response_providers)
 
         self.assertEqual(len(httpretty.httpretty.latest_requests), 2)
@@ -1178,7 +1187,6 @@ class CourseApiTests(CreditApiTestBase):
     )
     @ddt.unpack
     def test_get_provider_api_with_multiple_data(self, data, expected_data):
-        user = UserFactory.create()
         self._mock_ecommerce_courses_api(self.course_key, data)
-        response_providers = get_credit_providers_by_course(user, self.course_key)
+        response_providers = get_credit_providers_by_course(self.course_key)
         self.assertEqual(expected_data, response_providers)

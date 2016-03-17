@@ -68,7 +68,7 @@ def send_credit_notifications(username, course_key):
         # strip enclosing angle brackets from 'logo_image' cache 'Content-ID'
         logo_image_id = logo_image.get('Content-ID', '')[1:-1]
 
-    providers = get_credit_providers_by_course(user, course_key)
+    providers = get_credit_providers_by_course(course_key)
     providers_string = None
     if providers:
         if len(providers) > 1:
@@ -208,11 +208,10 @@ def _email_url_parser(url_name, extra_param=None):
     return urlparse.urlunparse(dashboard_link_parts)
 
 
-def get_credit_providers_by_course(user, course_key):
+def get_credit_providers_by_course(course_key):
     """Get the course information from ecommerce and parse the data to get providers.
 
     Arguments:
-        user (User): The user object.
         course_key (CourseKey): The identifier for the course.
 
     Returns:
