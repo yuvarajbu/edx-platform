@@ -36,3 +36,16 @@ def ecommerce_api_client(user):
                             tracking_context=create_tracking_context(user),
                             issuer=settings.JWT_ISSUER,
                             expires_in=settings.JWT_EXPIRATION)
+
+
+def ecommerce_api_client_service_user(user):
+    """ Returns an E-Commerce API client setup with authentication for the service user. """
+    return EdxRestApiClient(
+        settings.ECOMMERCE_API_URL,
+        settings.ECOMMERCE_API_SIGNING_KEY,
+        user.username,
+        user.email,
+        tracking_context=create_tracking_context(user),
+        issuer=settings.JWT_ISSUER,
+        expires_in=settings.JWT_EXPIRATION
+    )
