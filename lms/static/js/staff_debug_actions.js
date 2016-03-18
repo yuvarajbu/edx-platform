@@ -53,6 +53,9 @@ var StaffDebug = (function (){
                 response_json = $.parseJSON(request.responseText);
             } catch(e) {
                 response_json = { error: gettext('Unknown Error Occurred.') };
+                if (request.responseText) {
+                    response_json = { error: request.responseText }
+                }
             }
             var text = _.template(
                 '{error_msg} {error}',
