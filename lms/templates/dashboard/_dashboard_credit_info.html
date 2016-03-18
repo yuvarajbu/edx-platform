@@ -14,7 +14,12 @@
         error = credit_status['error']
 
         # Translators: provider_name is the name of a credit provider or university (e.g. State University)
-        credit_msg = _("You are now eligible for Credit from Charter Oak State College. Congratulations!")
+        if len(credit_status['provider_name']) > 1:
+            provider_text = "multiple providers"
+        else:
+            provider_text = credit_status['provider_name'][0]
+
+        credit_msg = _("You are now eligible for Credit from {provider}. Congratulations!".format(provider=provider_text))
         credit_msg_class = "credit-eligibility-msg"
         credit_btn_class = "purchase-credit-btn"
         credit_btn_label = _("Get Credit")

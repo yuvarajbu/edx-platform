@@ -125,6 +125,7 @@ from notification_prefs.views import enable_notifications
 
 # Note that this lives in openedx, so this dependency should be refactored.
 from openedx.core.djangoapps.credentials.utils import get_user_program_credentials
+from openedx.core.djangoapps.credit.email_utils import get_credit_providers_by_course
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard
 
@@ -933,7 +934,7 @@ def _credit_statuses(user, course_enrollments):
             "eligible": True,
             "deadline": eligibility["deadline"],
             "purchased": course_key in credit_enrollments,
-            "provider_name": None,
+            "provider_name": get_credit_providers_by_course(course_key),
             "provider_status_url": None,
             "provider_id": None,
             "request_status": request_status_by_course.get(course_key),
