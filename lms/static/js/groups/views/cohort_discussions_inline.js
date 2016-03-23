@@ -17,10 +17,11 @@
                     },
 
                     render: function () {
-                        var alwaysCohortInlineDiscussions = this.cohortSettings.get('always_cohort_inline_discussions');
+                        var alwaysCohortInlineDiscussions = this.cohortSettings.get('always_cohort_inline_discussions'),
+                            inline_discussions = this.model.get('inline_discussions');
 
                         this.$('.cohort-inline-discussions-nav').html(this.template({
-                            inlineDiscussionTopics: this.getInlineDiscussionsHtml(this.model.get('inline_discussions')),
+                            inlineDiscussionTopicsHtml: this.getInlineDiscussionsHtml(inline_discussions),
                             alwaysCohortInlineDiscussions:alwaysCohortInlineDiscussions
                         }));
 
@@ -59,7 +60,7 @@
                             } else { // subcategory
                                 html = categoryTemplate({
                                     name: name,
-                                    entries: this.getInlineDiscussionsHtml(subcategories[name]),
+                                    entriesHtml: this.getInlineDiscussionsHtml(subcategories[name]),
                                     isCategoryCohorted: isCategoryCohorted
                                 });
                             }

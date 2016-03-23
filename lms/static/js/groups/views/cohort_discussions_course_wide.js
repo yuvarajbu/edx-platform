@@ -15,7 +15,7 @@
 
                     render: function () {
                         this.$('.cohort-course-wide-discussions-nav').html(this.template({
-                            courseWideTopics: this.getCourseWideDiscussionsHtml(
+                            courseWideTopicsHtml: this.getCourseWideDiscussionsHtml(
                                 this.model.get('course_wide_discussions')
                             )
                         }));
