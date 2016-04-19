@@ -311,13 +311,17 @@ def get_static_file_url(asset):
     return staticfiles_storage.url(asset)
 
 
-def get_themes():
+def get_themes(themes_dir=None):
     """
     get a list of all themes known to the system.
+
+    Args:
+        themes_dir (str): path to dir containing all the themes
+
     Returns:
         list of themes known to the system.
     """
-    themes_dir = get_base_theme_dir()
+    themes_dir = Path(themes_dir) if themes_dir else get_base_theme_dir()
     # pick only directories and discard files in themes directory
     theme_names = []
     if themes_dir:

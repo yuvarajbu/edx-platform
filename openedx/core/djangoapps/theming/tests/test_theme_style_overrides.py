@@ -115,8 +115,8 @@ class TestComprehensiveThemeCMS(TestCase):
         """
         Test that theme sass files are used instead of default sass files.
         """
-        result = staticfiles.finders.find('test-theme/css/studio-main.css')
-        self.assertEqual(result, settings.TEST_THEME / "cms/static/css/studio-main.css")
+        result = staticfiles.finders.find('test-theme/css/studio-main-v1.css')
+        self.assertEqual(result, settings.TEST_THEME / "cms/static/css/studio-main-v1.css")
 
         cms_main_css = ""
         with open(result) as css_file:
@@ -208,8 +208,8 @@ class TestComprehensiveThemeDisabledCMS(TestCase):
         """
         Test that default css files served without comprehensive themes applied..
         """
-        result = staticfiles.finders.find('css/studio-main.css')
-        self.assertEqual(result, settings.REPO_ROOT / "cms/static/css/studio-main.css")
+        result = staticfiles.finders.find('css/studio-main-v1.css')
+        self.assertEqual(result, settings.REPO_ROOT / "cms/static/css/studio-main-v1.css")
 
         cms_main_css = ""
         with open(result) as css_file:

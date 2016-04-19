@@ -636,6 +636,31 @@ def collect_assets(systems, settings):
         print("\t\tFinished collecting {} assets.".format(sys))
 
 
+def execute_compile_sass(args):
+    """
+    Construct django management command compile_sass (defined in theming app) and execute it.
+
+    Args:
+        args: command line argument passed via update_assets command
+    """
+    for sys in args.system:
+        options = ""
+        options += " --themes " + " ".join(args.themes) if args.themes else ""
+        options += " --themes-dir=" + args.themes_dir if args.themes_dir else ""
+        options += " --debug" if args.debug else ""
+
+        sh(
+            django_cmd(
+                sys,
+                args.settings,
+                "compile_sass {system} {options} > /dev/null".format(
+                    system='cms' if sys == 'studio' else sys,
+                    options=options,
+                ),
+            ),
+        )
+
+
 @task
 @cmdopts([
     ('background', 'b', 'Background mode'),
@@ -729,10 +754,8 @@ def update_assets(args):
     process_npm_assets()
     compile_coffeescript()
 
-    call_task(
-        'pavelib.assets.compile_sass',
-        options={'system': args.system, 'debug': args.debug, 'themes_dir': args.themes_dir, 'themes': args.themes},
-    )
+    # Compile sass for themes and system
+    execute_compile_sass(args)
 
     if args.collect:
         collect_assets(args.system, args.settings)
