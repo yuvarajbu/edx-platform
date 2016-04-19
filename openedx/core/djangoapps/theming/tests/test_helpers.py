@@ -4,6 +4,7 @@ from mock import patch
 
 from django.test import TestCase, RequestFactory, override_settings
 from django.conf import settings
+from django.contrib.sites.models import Site
 
 from openedx.core.djangoapps.theming.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.theming.helpers import get_template_path_with_theme, strip_site_theme_templates_path, \
@@ -36,6 +37,22 @@ class TestHelpers(TestCase):
         ]
         actual_themes = get_themes()
         self.assertItemsEqual(expected_themes, actual_themes)
+
+    def test_default_site_theme(self):
+        """
+        Tests template paths are returned from enabled theme.
+        """
+        # create a test site that does not have a theme
+        domain = "test.org"
+        site, __ = Site.objects.get_or_create(domain=domain, name=domain)
+        with patch(
+            'edxmako.middleware.REQUEST_CONTEXT.request',
+            RequestFactory().get('/', SERVER_NAME=domain),
+            create=True,
+        ):
+            with patch('openedx.core.djangoapps.theming.helpers.get_current_site', return_value=site):
+                with override_settings(DEFAULT_SITE_THEME="edx.org"):
+                    self.assertEqual(get_current_site_theme_dir(), "edx.org")
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

@@ -395,9 +395,6 @@ COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
 
-# comprehensive theming system
-COMPREHENSIVE_THEME_DIR = REPO_ROOT / "themes"
-
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
@@ -2879,9 +2876,18 @@ WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "request_cache.middleware.RequestCache"
 # Dafault site id to use in case there is no site that matches with the request headers.
 DEFAULT_SITE_ID = 1
 
+# Settings for Comprehensive Theming app
+
 # Cache time out settings
 # by Comprehensive Theme system
 THEME_CACHE_TIMEOUT = 30 * 60
+
+# dir containing all themes
+COMPREHENSIVE_THEME_DIR = REPO_ROOT / "themes"
+
+# Theme to use when no site or site theme is defined,
+# set to None if you want to use openedx theme
+DEFAULT_SITE_THEME = None
 
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'

@@ -68,6 +68,9 @@ from lms.envs.common import (
 
     # Cache time out settings for comprehensive theming system
     THEME_CACHE_TIMEOUT,
+
+    # Theme to use when no site or site theme is defined,
+    DEFAULT_SITE_THEME,
 )
 from path import Path as path
 from warnings import simplefilter

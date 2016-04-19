@@ -9,6 +9,7 @@ from django.conf import settings, ImproperlyConfigured
 from django.core.cache import cache
 from django.contrib.staticfiles.storage import staticfiles_storage
 
+from openedx.core.djangoapps.theming.models import SiteTheme
 from microsite_configuration import microsite
 from microsite_configuration import page_title_breadcrumbs
 
@@ -202,7 +203,7 @@ def get_current_site_theme_dir():
 
     # if site theme dir is not in cache and comprehensive theming is enabled then pull it from db.
     if not site_theme_dir and is_comprehensive_theming_enabled():
-        site_theme = site.themes.first()  # pylint: disable=no-member
+        site_theme = SiteTheme.get_theme(site)
         if site_theme:
             site_theme_dir = site_theme.theme_dir_name
             cache_site_theme_dir(site, site_theme_dir)
