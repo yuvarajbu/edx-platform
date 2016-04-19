@@ -146,6 +146,8 @@ class TestPaverWatchAssetTasks(TestCase):
         self.expected_sass_directories = [
             path('common/static/sass'),
             path('common/static'),
+            path('node_modules'),
+            path('node_modules/edx-pattern-library/node_modules'),
             path('lms/static/sass/partials'),
             path('lms/static/sass'),
             path('lms/static/certificates/sass'),
@@ -200,4 +202,3 @@ class TestPaverWatchAssetTasks(TestCase):
                 self.assertIsInstance(sass_watcher_args[0], PollingObserver)
                 self.assertIsInstance(sass_watcher_args[1], list)
                 self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
-

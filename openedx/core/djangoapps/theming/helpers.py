@@ -299,8 +299,8 @@ def get_static_file_url(asset):
     Returns url of the themed asset if asset is not themed than returns the default asset url.
 
     Example:
-        >> get_static_file_url('css/lms-main.css')
-        '/static/red-theme/css/lms-main.css'
+        >> get_static_file_url('css/lms-main-v1.css')
+        '/static/red-theme/css/lms-main-v1.css'
 
     Parameters:
         asset (str): asset's path relative to the static files directory
