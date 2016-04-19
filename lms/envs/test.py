@@ -494,6 +494,8 @@ MICROSITE_CONFIGURATION = {
 MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
 MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 
+TEST_THEME = COMMON_ROOT / "test" / "test-theme"
+
 # add extra template directory for test-only templates
 MAKO_TEMPLATES['main'].extend([
     COMMON_ROOT / 'test' / 'templates',
@@ -585,3 +587,6 @@ TransformerRegistry.USE_PLUGIN_MANAGER = False
 # Set the default Oauth2 Provider Model so that migrations can run in
 # verbose mode
 OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+
+
+COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
