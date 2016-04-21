@@ -2,7 +2,7 @@ define([
     'underscore',
     'common/js/components/views/search_field',
     'common/js/components/collections/paging_collection',
-    'common/js/spec_helpers/ajax_helpers'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ], function (_, SearchFieldView, PagingCollection, AjaxHelpers) {
     'use strict';
     describe('SearchFieldView', function () {

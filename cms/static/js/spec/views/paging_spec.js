@@ -1,6 +1,6 @@
 define([
     "jquery",
-    "common/js/spec_helpers/ajax_helpers",
+    "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers",
     "URI",
     "js/views/paging",
     "js/views/paging_header",

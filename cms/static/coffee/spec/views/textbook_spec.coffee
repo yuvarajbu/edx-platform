@@ -1,8 +1,8 @@
 define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js/models/course",
     "js/collections/textbook", "js/views/show_textbook", "js/views/edit_textbook", "js/views/list_textbooks",
     "js/views/edit_chapter", "common/js/components/views/feedback_prompt",
-    "common/js/components/views/feedback_notification", "common/js/components/utils/view_utils","common/js/spec_helpers/ajax_helpers",
-    "js/spec_helpers/modal_helpers", "jasmine-stealth"],
+    "common/js/components/views/feedback_notification", "common/js/components/utils/view_utils",
+    "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/spec_helpers/modal_helpers", "jasmine-stealth"],
 (Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTextbooks, EditChapter, Prompt, Notification, ViewUtils, AjaxHelpers, modal_helpers) ->
 
     beforeEach ->

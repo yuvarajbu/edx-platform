@@ -2,11 +2,11 @@ define(['jquery',
         'backbone',
         'underscore',
         'URI',
-        'common/js/components/collections/paging_collection',
-        'common/js/spec_helpers/ajax_helpers',
-        'common/js/spec_helpers/spec_helpers'
+        'edx-ui-toolkit/js/utils/spec-helpers/spec-helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/components/collections/paging_collection'
     ],
-    function ($, Backbone, _, URI, PagingCollection, AjaxHelpers, SpecHelpers) {
+    function ($, Backbone, _, URI, SpecHelpers, AjaxHelpers, PagingCollection) {
         'use strict';
 
         describe('PagingCollection', function () {
@@ -17,8 +17,8 @@ define(['jquery',
                 respond: function (requests) {
                     var request = AjaxHelpers.currentRequest(requests),
                         params = (new URI(request.url)).query(true),
-                        page = parseInt(params['page'], 10),
-                        page_size = parseInt(params['page_size'], 10),
+                        page = parseInt(params.page, 10),
+                        page_size = parseInt(params.page_size, 10),
                         page_count = Math.ceil(this.count / page_size);
 
                     // Make zeroPage consistently start at zero for ease of calculation

@@ -4,7 +4,7 @@
             'jquery',
             'underscore',
             'common/js/spec_helpers/template_helpers',
-            'common/js/spec_helpers/ajax_helpers',
+            'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
             'js/student_account/models/LoginModel',
             'js/student_account/views/LoginView',
             'js/student_account/models/PasswordResetModel'

@@ -4,7 +4,7 @@ define(
         'js/views/video/transcripts/utils',
         'js/views/video/transcripts/metadata_videolist', 'js/models/metadata',
         'js/views/abstract_editor',
-        'common/js/spec_helpers/ajax_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'xmodule', 'jasmine-jquery'
     ],
 function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, AjaxHelpers) {

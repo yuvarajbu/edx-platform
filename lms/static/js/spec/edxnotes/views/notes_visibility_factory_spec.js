@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'annotator_1.2.9', 'common/js/spec_helpers/ajax_helpers',
+    'jquery', 'underscore', 'annotator_1.2.9', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/edxnotes/views/notes_visibility_factory', 'js/spec/edxnotes/helpers',
     'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
 ], function(

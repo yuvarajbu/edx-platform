@@ -1,4 +1,5 @@
-require ["jquery", "backbone", "coffee/src/main", "common/js/spec_helpers/ajax_helpers", "jasmine-stealth", "jquery.cookie"],
+require ["jquery", "backbone", "coffee/src/main", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", 
+         "jasmine-stealth", "jquery.cookie"],
 ($, Backbone, main, AjaxHelpers) ->
     describe "CMS", ->
         it "should initialize URL", ->

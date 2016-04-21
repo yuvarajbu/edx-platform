@@ -4,7 +4,7 @@
   "dependencies": {
     "coffee-script": "1.6.1",
     "edx-pattern-library": "~0.12.4",
-    "edx-ui-toolkit": "~0.9.1",
+    "edx-ui-toolkit": "git+https://github.com/edx/edx-ui-toolkit.git#f63c73151cf2d26bddc989f58b422ab37c621980",
     "requirejs": "~2.1.22",
     "uglify-js": "2.4.24",
     "underscore": "~1.8.3",

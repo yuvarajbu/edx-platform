@@ -1,4 +1,4 @@
-define(['backbone', 'jquery', 'underscore', 'URI', 'common/js/spec_helpers/ajax_helpers',
+define(['backbone', 'jquery', 'underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/spec/student_profile/helpers',
         'js/student_profile/views/badge_list_container',
         'common/js/components/collections/paging_collection'

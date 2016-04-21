@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'js/edxnotes/views/search_box',
+    'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/edxnotes/views/search_box',
     'js/edxnotes/collections/notes', 'js/spec/edxnotes/custom_matchers', 'js/spec/edxnotes/helpers', 'jasmine-jquery'
 ], function($, _, AjaxHelpers, SearchBoxView, NotesCollection, customMatchers, Helpers) {
     'use strict';
