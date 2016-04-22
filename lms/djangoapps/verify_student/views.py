@@ -8,7 +8,6 @@ import json
 import logging
 import urllib
 from pytz import UTC
-from ipware.ip import get_ip
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -59,6 +58,7 @@ from lms.djangoapps.verify_student.image import decode_image_data, InvalidImageD
 from util.json_request import JsonResponse
 from util.date_utils import get_default_time_display
 from util.db import outer_atomic
+from util.views import redirect_if_blocked
 from xmodule.modulestore.django import modulestore
 from django.contrib.staticfiles.storage import staticfiles_storage
 
@@ -203,6 +203,7 @@ class PayAndVerifyView(View):
     VERIFICATION_DEADLINE = "verification"
     UPGRADE_DEADLINE = "upgrade"
 
+    @redirect_if_blocked
     @method_decorator(login_required)
     def get(
         self, request, course_id,
@@ -242,17 +243,6 @@ class PayAndVerifyView(View):
         if course is None:
             log.warn(u"Could not find course with ID %s.", course_id)
             raise Http404
-
-        # Check whether the user has access to this course
-        # based on country access rules.
-        redirect_url = embargo_api.redirect_if_blocked(
-            course_key,
-            user=request.user,
-            ip_address=get_ip(request),
-            url=request.path
-        )
-        if redirect_url:
-            return redirect(redirect_url)
 
         # If the verification deadline has passed
         # then show the user a message that he/she can't verify.

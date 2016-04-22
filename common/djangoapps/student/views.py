@@ -11,7 +11,6 @@ from urlparse import urljoin
 
 from pytz import UTC
 from requests import HTTPError
-from ipware.ip import get_ip
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -102,7 +101,7 @@ from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
     validate_password_dictionary
 )
-
+from util.views import redirect_if_blocked
 import third_party_auth
 from third_party_auth import pipeline, provider
 from student.helpers import (
@@ -970,6 +969,7 @@ def _credit_statuses(user, course_enrollments):
 @transaction.non_atomic_requests
 @require_POST
 @outer_atomic(read_committed=True)
+@redirect_if_blocked
 def change_enrollment(request, check_access=True):
     """
     Modify the enrollment status for the logged-in user.
@@ -1039,17 +1039,6 @@ def change_enrollment(request, check_access=True):
             _update_email_opt_in(request, course_id.org)
 
         available_modes = CourseMode.modes_for_course_dict(course_id)
-
-        # Check whether the user is blocked from enrolling in this course
-        # This can occur if the user's IP is on a global blacklist
-        # or if the user is enrolling in a country in which the course
-        # is not available.
-        redirect_url = embargo_api.redirect_if_blocked(
-            course_id, user=user, ip_address=get_ip(request),
-            url=request.path
-        )
-        if redirect_url:
-            return HttpResponse(redirect_url)
 
         # Check that auto enrollment is allowed for this course
         # (= the course is NOT behind a paywall)

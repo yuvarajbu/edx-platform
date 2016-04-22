@@ -82,8 +82,7 @@ from util.cache import cache, cache_if_anonymous
 from util.date_utils import strftime_localized
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
-from util.views import _record_feedback_in_zendesk
-from util.views import ensure_valid_course_key
+from util.views import _record_feedback_in_zendesk, ensure_valid_course_key, redirect_if_blocked
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
@@ -99,6 +98,8 @@ from .entrance_exams import (
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
 
 from lang_pref import LANGUAGE_KEY
+
+from embargo import api as embargo_api
 
 log = logging.getLogger("edx.courseware")
 
@@ -317,6 +318,7 @@ def save_positions_recursively_up(user, request, field_data_cache, xmodule, cour
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @ensure_valid_course_key
+@redirect_if_blocked
 @outer_atomic(read_committed=True)
 def index(request, course_id, chapter=None, section=None,
           position=None):

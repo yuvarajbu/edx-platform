@@ -2,12 +2,14 @@ import json
 import logging
 import sys
 from functools import wraps
+from ipware.ip import get_ip
 
 from django.conf import settings
 from django.core.cache import caches
 from django.core.validators import ValidationError, validate_email
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import server_error
+from django.shortcuts import redirect
 from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
                          HttpResponseServerError)
 import dogstats_wrapper as dog_stats_api
@@ -20,6 +22,8 @@ import track.views
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+
+from embargo import api as embargo_api
 
 log = logging.getLogger(__name__)
 
@@ -37,6 +41,36 @@ def ensure_valid_course_key(view_func):
                 CourseKey.from_string(course_key)
             except InvalidKeyError:
                 raise Http404
+
+        response = view_func(request, *args, **kwargs)
+        return response
+
+    return inner
+
+
+def redirect_if_blocked(view_func):
+    """
+    This decorator check whether the user has access to the course based on country access rules.
+    """
+    @wraps(view_func)
+    def inner(request, *args, **kwargs):
+        course_key = kwargs.get('course_id') or request.POST.get("course_id")
+        if course_key is not None:
+            try:
+                course_id = CourseKey.from_string(course_key)
+            except InvalidKeyError:
+                raise Http404
+
+        redirect_url = embargo_api.redirect_if_blocked(
+            course_id,
+            user=request.user,
+            ip_address=get_ip(request),
+            url=request.path
+        )
+        if redirect_url:
+            if request.is_ajax():
+                return HttpResponse(redirect_url)
+            return redirect(redirect_url)
 
         response = view_func(request, *args, **kwargs)
         return response
