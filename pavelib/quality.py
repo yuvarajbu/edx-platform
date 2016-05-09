@@ -344,7 +344,16 @@ def run_safelint(options):
     safelint_counts = _get_safelint_counts(safelint_report)
 
     try:
-        num_violations = int(safelint_counts['total'])
+        metrics_str = "Number of {safelint_script} violations: {num_violations}\n".format(
+            safelint_script=safelint_script, num_violations=int(safelint_counts['total'])
+        )
+        if 'rules' in safelint_counts and any(safelint_counts['rules']):
+            metrics_str += "\n"
+            for rule, count in safelint_counts['rules'].iteritems():
+                metrics_str += "{rule} violations: {count}\n".format(
+                    rule=rule,
+                    count=int(count)
+                )
     except TypeError:
         raise BuildFailure(
             "Error. Number of {safelint_script} violations could not be found in {safelint_report}".format(
@@ -352,14 +361,11 @@ def run_safelint(options):
             )
         )
 
-    # Print number of violations to log.
-    violations_count_str = "Number of {safelint_script} violations: {num_violations}".format(
-        safelint_script=safelint_script, num_violations=num_violations
-    )
-    print violations_count_str
-
+    metrics_report = (Env.METRICS_DIR / "safelint")
     # Record the metric
-    _write_metric(violations_count_str, (Env.METRICS_DIR / "safelint"))
+    _write_metric(metrics_str, metrics_report)
+    # Print number of violations to log.
+    sh("cat {metrics_report}".format(metrics_report=metrics_report), ignore_error=True)
 
     error_message = ""
 
@@ -400,7 +406,7 @@ def run_safelint(options):
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
-def run_safecommit():
+def run_safecommit_report():
     """
     Runs safe-commit-linter.sh on the current branch.
     """
@@ -410,7 +416,7 @@ def run_safecommit():
     _prepare_report_dir(safecommit_report_dir)
 
     sh(
-        "{repo_root}/scripts/{safecommit_script} >> {safecommit_report}".format(
+        "{repo_root}/scripts/{safecommit_script} | tee {safecommit_report} -a".format(
             repo_root=Env.REPO_ROOT,
             safecommit_script=safecommit_script,
             safecommit_report=safecommit_report,
@@ -468,7 +474,7 @@ def _get_report_contents(filename, last_line_only=False):
             string with full contents.
 
     Returns:
-        String containging full contents of the report, or the last line.
+        String containing full contents of the report, or the last line.
 
     """
     file_not_found_message = "The following log file could not be found: {file}".format(file=filename)

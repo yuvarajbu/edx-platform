@@ -87,7 +87,7 @@ case "$TEST_SUITE" in
         echo "Running safe template linter report."
         paver run_safelint -t $SAFELINT_THRESHOLDS > safelint.log || { cat safelint.log; EXIT=1; }
         echo "Running safe commit linter report."
-        paver run_safecommit > safecommit.log || { cat safecommit.log; EXIT=1; }
+        paver run_safecommit_report > safecommit.log || { cat safecommit.log; EXIT=1; }
         # Run quality task. Pass in the 'fail-under' percentage to diff-quality
         echo "Running diff quality."
         paver run_quality -p 100 || EXIT=1
