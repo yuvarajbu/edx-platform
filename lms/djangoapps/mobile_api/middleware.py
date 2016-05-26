@@ -102,13 +102,13 @@ class AppVersionUpgrade(object):
                 last_supported_date = cached_data.get(last_supported_date_cache_key)
                 if not last_supported_date:
                     last_supported_date = self._get_last_supported_date(platform.NAME, platform.version)
-                    cache.set(last_supported_date_cache_key, last_supported_date, self.CACHE_TIMEOUT)
+                    # cache.set(last_supported_date_cache_key, last_supported_date, self.CACHE_TIMEOUT)
                 request_cache_dict[self.LAST_SUPPORTED_DATE_HEADER] = last_supported_date
 
                 latest_version = cached_data.get(latest_version_cache_key)
                 if not latest_version:
                     latest_version = self._get_latest_version(platform.NAME)
-                    cache.set(latest_version_cache_key, latest_version, self.CACHE_TIMEOUT)
+                    # cache.set(latest_version_cache_key, latest_version, self.CACHE_TIMEOUT)
                 request_cache_dict[self.LATEST_VERSION_HEADER] = latest_version
 
                 return request_cache_dict
