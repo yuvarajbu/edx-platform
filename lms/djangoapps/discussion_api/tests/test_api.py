@@ -2037,7 +2037,6 @@ class UpdateThreadTest(
                 "closed": ["False"],
                 "pinned": ["False"],
                 "read": ["False"],
-                "requested_user_id": [str(self.user.id)],
             }
         )
 
