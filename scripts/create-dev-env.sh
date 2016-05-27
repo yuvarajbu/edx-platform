@@ -421,8 +421,8 @@ fi
 
 # compile numpy and scipy if requested
 
-NUMPY_VER="1.6.2"
-SCIPY_VER="0.10.1"
+NUMPY_VER="1.11.0"
+SCIPY_VER="0.17.1"
 
 if [[ -n $compile ]]; then
     output "Downloading numpy and scipy"
