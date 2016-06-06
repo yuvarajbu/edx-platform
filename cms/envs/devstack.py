@@ -97,6 +97,7 @@ FEATURES['MILESTONES_APP'] = True
 
 ################################ ENTRANCE EXAMS ################################
 FEATURES['ENTRANCE_EXAMS'] = True
+FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 
 ################################ COURSE LICENSES ################################
 FEATURES['LICENSING'] = True
