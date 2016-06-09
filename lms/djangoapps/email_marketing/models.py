@@ -50,7 +50,6 @@ class EmailMarketingConfiguration(ConfigurationModel):
 
     sailthru_activation_template = models.fields.CharField(
         max_length=20,
-        blank=True,
         help_text=_(
             "Sailthru template to use on activation send. "
         )
