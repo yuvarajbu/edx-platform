@@ -16,7 +16,7 @@ class @Calculator
     @hintButton = $('#calculator_hint')
     @hintPopup = $('.help')
     @hintsList = @hintPopup.find('.hint-item')
-    @selectHint($('#' + @hintPopup.attr('aria-activedescendant')));
+    @selectHint($('#' + @hintPopup.attr('data-calculator-hint')));
 
     $('.calc').click @toggle
     $('form#calculator').submit(@calculate).submit (e) ->
@@ -106,7 +106,7 @@ class @Calculator
 
     @activeHint = element;
     @activeHint.focus();
-    @hintPopup.attr('aria-activedescendant', element.attr('id'));
+    @hintPopup.attr('data-calculator-hint', element.attr('id'));
 
   prevHint: () ->
     prev = @activeHint.prev(); # the previous hint

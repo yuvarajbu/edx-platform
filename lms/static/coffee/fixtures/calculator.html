@@ -1,13 +1,13 @@
 <ul>
   <li class="calc-main">
-    <a href="#" class="calc" title="Open Calculator" role="button" aria-controls="calculator_wrapper" aria-expanded="false">Open Calculator</a>
+    <button class="calc" title="Open Calculator" aria-controls="calculator_wrapper" aria-expanded="false">Open Calculator</button>
     <div id="calculator_wrapper">
       <form id="calculator">
         <div class="input-wrapper">
           <input type="text" id="calculator_input" tabindex="-1" />
           <div class="help-wrapper">
-            <a id="calculator_hint" href="#" role="button" aria-haspopup="true" tabindex="-1">Hints</a>
-            <ul id="calculator_input_help" class="help" aria-activedescendant="hint-integers" role="tooltip" aria-hidden="true">
+            <button id="calculator_hint" aria-haspopup="true">Hints</button>
+            <ul id="calculator_input_help" class="help" data-calculator-hint="hint-integers" role="tooltip" aria-hidden="true">
                 <li class="hint-item" id="hint-moreinfo" tabindex="-1">
                   <p>
                     <span class="bold">For detailed information, see
@@ -21,8 +21,8 @@
             </ul>
           </div>
         </div>
-        <input id="calculator_button" type="submit" title="Calculate" arial-label="Calculate" value="=" tabindex="-1" />
-        <input type="text" id="calculator_output" readonly tabindex="-1" />
+        <input id="calculator_button" type="submit" title="Calculate" aria-label="Calculate" value="=" />
+        <input type="text" id="calculator_output" readonly />
       </form>
     </div>
   </li>
