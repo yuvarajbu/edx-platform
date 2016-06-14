@@ -14,6 +14,13 @@
                tabTemplate,
                tabPanelTemplate
            ) {
+                var keys = {
+                    'left':     37,
+                    'right':    39,
+                    'down':     40,
+                    'up':       38
+                };
+               
                var getTabPanelId = function (id) {
                    return 'tabpanel-' + id;
                };
@@ -34,7 +41,8 @@
 
                var TabbedView = Backbone.View.extend({
                    events: {
-                       'click .nav-item.tab': 'switchTab'
+                       'click .nav-item.tab': 'switchTab',
+                       'keydown .nav-item.tab': 'keydownHandler'
                    },
 
                    /**
@@ -104,7 +112,7 @@
                         .attr({
                             'aria-expanded': 'false',
                             'aria-selected': 'false',
-                            'tabindex': 0
+                            'tabindex': '-1'
                         });
                        
                        this.$('.tabpanel[aria-hidden="false"]')
@@ -119,7 +127,8 @@
                         .addClass('is-active')
                         .attr({
                             'aria-expanded': 'true',
-                            'aria-selected': 'true'
+                            'aria-selected': 'true',
+                            'tabindex': '0'
                         });
                        
                        view.$el
@@ -136,6 +145,70 @@
                    switchTab: function (event) {
                        event.preventDefault();
                        this.setActiveTab($(event.currentTarget).data('index'));
+                   },
+                   
+                   previousTab: function(focused, index, total, event) {
+                        var tab, panel;
+
+                        if (event.altKey || event.shiftKey) {
+                            return true;
+                        }
+
+                        if (index === 0) {
+                            tab = $(focused).parent().find('.tab').last();                            
+                        } else {
+                            tab = $(focused).parent().find('.tab:eq(' + index + ')').prev();
+                        }
+
+                        panel = $(tab).data('index');
+
+                        tab.focus();
+                        this.setActiveTab(panel);
+
+                        return false;
+                   },
+                   
+                   nextTab: function(focused, index, total, event) {
+                       var tab, panel;
+
+                       if (event.altKey || event.shiftKey) {
+                           return true;
+                       }
+
+                       if (index === total) {
+                           tab = $(focused).parent().find('.tab').first();                           
+                       } else {
+                           tab = $(focused).parent().find('.tab:eq(' + index + ')').next();
+                       }
+
+                       panel = $(tab).data('index');
+
+                       tab.focus();
+                       this.setActiveTab(panel);
+                       
+                       return false;
+                   },
+                   
+                   keydownHandler: function(event) {
+                        var key = event.which,
+                            focused = $(event.currentTarget),
+                            index = $(event.currentTarget).parent().find('.tab').index(focused),
+                            total = $(event.currentTarget).parent().find('.tab').size() - 1;
+                        
+                        switch (key) {
+                            case keys.left:
+                            case keys.up:
+                                this.previousTab(focused, index, total, event);
+                                break;
+                                
+                            case keys.right:
+                            case keys.down:
+                                this.nextTab(focused, index, total, event);
+                                break;
+                                
+                            default:
+                                return true;
+                        }
                    },
 
                    /**
