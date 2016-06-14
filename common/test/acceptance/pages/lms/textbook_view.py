@@ -26,3 +26,8 @@ class TextbookViewPage(CoursePage):
 
         driver = test.get_web_driver()
         driver.switch_to_frame(driver.find_element_by_tag_name("iframe"))
+
+        # The pdf has not necessarily loaded even though the iframe for the viewer has, so we wait for that to load
+        EmptyPromise(
+            lambda: self.q(css='.textLayer').visible, "Pdf loaded"
+        ).fulfill()

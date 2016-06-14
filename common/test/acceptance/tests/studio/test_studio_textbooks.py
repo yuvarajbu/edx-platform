@@ -80,6 +80,7 @@ class TextbooksTest(StudioCourseTest):
         self.textbook_view_page.switch_to_pdf_frame(self)
         self.textbook_view_page.a11y_audit.config.set_rules({
             'ignore': [
+                'color-contrast',
                 'html-lang',  # AC-504
                 'meta-viewport',  # AC-505
                 'skip-link',  # AC-506
