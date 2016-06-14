@@ -7,7 +7,16 @@
             'common/js/components/views/tabbed_view'
            ],
            function($, _, Backbone, TabbedView) {
-               var view,
+               var keys = {
+                       'UP': 38,
+                       'DOWN': 40,
+                       'LEFT': 37,
+                       'RIGHT': 39
+                   },
+                   keyPressEvent = function(key) {
+                       return $.Event('keydown', { keyCode: key });
+                   },
+                   view,
                    TestSubview = Backbone.View.extend({
                        initialize: function (options) {
                            this.text = options.text;
@@ -22,7 +31,7 @@
                        return view.$('.page-content-nav');
                    },
                    activeTabPanel = function () {
-                       return view.$('.tabpanel[aria-expanded="true"]');
+                       return view.$('.tabpanel[aria-hidden="false"]');
                    };
 
                describe('TabbedView component', function () {
@@ -39,17 +48,6 @@
                            }],
                            viewLabel: 'Tabs',
                        }).render();
-
-                       // _.defer() is used to make calls to
-                       // jQuery.focus() work in Chrome.  _.defer()
-                       // delays the execution of a function until the
-                       // current call stack is clear.  That behavior
-                       // will cause tests to fail, so we'll instead
-                       // make _.defer() immediately invoke its
-                       // argument.
-                       spyOn(_, 'defer').and.callFake(function (func) {
-                           func();
-                       });
                    });
 
                    it('can render itself', function () {
@@ -73,17 +71,91 @@
                    });
 
                    it('marks the active tab as selected using aria attributes', function () {
-                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr('aria-expanded', 'true');
-                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr('aria-expanded', 'false');
+                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
+                           'aria-expanded': 'true',
+                           'aria-selected': 'true',
+                           'tabindex': '0'
+                       });
+                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
+                           'aria-expanded': 'false',
+                           'aria-selected': 'false',
+                           'tabindex': '-1'
+                       });
                        view.$('.nav-item[data-index=1]').click();
-                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr('aria-expanded', 'false');
-                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr('aria-expanded', 'true');
+                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
+                           'aria-expanded': 'false',
+                           'aria-selected': 'false',
+                           'tabindex': '-1'
+                       });
+                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
+                           'aria-expanded': 'true',
+                           'aria-selected': 'true',
+                           'tabindex': '0'
+                       });
                    });
-
-                   it('sets focus for screen readers', function () {
-                       spyOn($.fn, 'focus');
-                       view.$('.nav-item[data-url="test-2"]').click();
-                       expect(view.$('.sr-is-focusable.test-2').focus).toHaveBeenCalled();
+                   
+                   it('works with keyboard navigation RIGHT', function() {
+                       view.$('.nav-item[data-index=0]').focus();
+                       view.$('.nav-item[data-index=0]').trigger(keyPressEvent(keys.RIGHT));
+                       
+                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
+                           'aria-expanded': 'false',
+                           'aria-selected': 'false',
+                           'tabindex': '-1'
+                       });
+                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
+                           'aria-expanded': 'true',
+                           'aria-selected': 'true',
+                           'tabindex': '0'
+                       });
+                   });
+                   
+                   it('works with keyboard navigation DOWN and wraps', function() {
+                       view.$('.nav-item[data-index=1]').focus();
+                       view.$('.nav-item[data-index=1]').trigger(keyPressEvent(keys.DOWN));
+                       
+                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
+                           'aria-expanded': 'false',
+                           'aria-selected': 'false',
+                           'tabindex': '-1'
+                       });
+                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
+                           'aria-expanded': 'true',
+                           'aria-selected': 'true',
+                           'tabindex': '0'
+                       });
+                   });
+                   
+                   it('works with keyboard navigation LEFT', function() {
+                       view.$('.nav-item[data-index=1]').focus();
+                       view.$('.nav-item[data-index=1]').trigger(keyPressEvent(keys.LEFT));
+                       
+                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
+                           'aria-expanded': 'false',
+                           'aria-selected': 'false',
+                           'tabindex': '-1'
+                       });
+                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
+                           'aria-expanded': 'true',
+                           'aria-selected': 'true',
+                           'tabindex': '0'
+                       });
+                   });
+                   
+                   it('works with keyboard navigation UP and wraps', function() {
+                       view.$('.nav-item[data-index=0]').focus();
+                       view.$('.nav-item[data-index=0]').trigger(keyPressEvent(keys.UP));
+                       
+                       expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
+                           'aria-expanded': 'false',
+                           'aria-selected': 'false',
+                           'tabindex': '-1'
+                       });
+                       expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
+                           'aria-expanded': 'true',
+                           'aria-selected': 'true',
+                           'tabindex': '0'
+                       });
                    });
 
                    describe('history', function() {
