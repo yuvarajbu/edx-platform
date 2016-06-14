@@ -97,16 +97,37 @@
                            tab = tabMeta.tab,
                            tabEl = tabMeta.element,
                            view = tab.view;
+                       
                        // Hide old tab/tabpanel
-                       this.$('button.is-active').removeClass('is-active').attr('aria-expanded', 'false');
-                       this.$('.tabpanel[aria-expanded="true"]').attr('aria-expanded', 'false').addClass('is-hidden');
+                       this.$('button.is-active')
+                        .removeClass('is-active')
+                        .attr({
+                            'aria-expanded': 'false',
+                            'aria-selected': 'false',
+                            'tabindex': 0
+                        });
+                       
+                       this.$('.tabpanel[aria-hidden="false"]')
+                        .addClass('is-hidden')
+                        .attr({
+                            'aria-expanded': 'false',
+                            'aria-hidden': 'true'
+                        });
+                       
                        // Show new tab/tabpanel
-                       tabEl.addClass('is-active').attr('aria-expanded', 'true');
-                       view.$el.attr('aria-expanded', 'true').removeClass('is-hidden');
-                       // This bizarre workaround makes focus work in Chrome.
-                       _.defer(function () {
-                           view.$('.sr-is-focusable.' + getTabPanelId(tab.url)).focus();
-                       });
+                       tabEl
+                        .addClass('is-active')
+                        .attr({
+                            'aria-expanded': 'true',
+                            'aria-selected': 'true'
+                        });
+                       
+                       view.$el
+                        .removeClass('is-hidden')
+                        .attr({
+                            'aria-hidden': 'false',
+                        });
+
                        if (this.router) {
                            this.router.navigate(tab.url, {replace: true});
                        }
