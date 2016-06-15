@@ -32,32 +32,27 @@
 
             indicators: {
                 'canEdit': HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="icon fa fa-pencil message-can-edit" aria-hidden="true"></span>'),
-                    HtmlUtils.HTML('<span class="sr">'),
+                    HtmlUtils.HTML('<span class="icon fa fa-pencil message-can-edit" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
                     gettext("Editable"),
                     HtmlUtils.HTML('</span>')
                 ),
                 'error': HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span>'),
-                    HtmlUtils.HTML('<span class="sr">'),
+                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
                     gettext("Error"),
                     HtmlUtils.HTML('</span>')
                 ),
                 'validationError': HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-validation-error" '),
-                    HtmlUtils.HTML('aria-hidden="true"></span><span class="sr">'),
+                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
                     gettext("Validation Error"),
                     HtmlUtils.HTML('</span>')
                 ),
                 'inProgress': HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" '),
-                    HtmlUtils.HTML('aria-hidden="true"></span><span class="sr">'),
+                    HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
                     gettext("In Progress"),
                     HtmlUtils.HTML('</span>')
                 ),
                 'success': HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="fa fa-check message-success" aria-hidden="true"></span>'),
-                    HtmlUtils.HTML('<span class="sr">'),
+                    HtmlUtils.HTML('<span class="fa fa-check message-success" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
                     gettext("Success"),
                     HtmlUtils.HTML('</span>')
                 ),
@@ -65,7 +60,7 @@
                     HtmlUtils.HTML('<span class="fa fa-plus placeholder" aria-hidden="true"></span><span class="sr">'),
                     gettext("Placeholder"),
                     HtmlUtils.HTML('</span>')
-                ),
+                )
             },
 
             messages: {
@@ -90,8 +85,8 @@
                 this.enabled = _.isUndefined(this.options.enabled) ? true: this.options.enabled;
 
                 _.bindAll(this, 'modelValue', 'modelValueIsSet', 'showNotificationMessage','getNotificationMessage',
-                    'getMessage', 'title', 'showHelpMessage', 'showInProgressMessage', 'showSuccessMessage',
-                    'showErrorMessage'
+                    'getMessageHTML', 'getMessage', 'title', 'showHelpMessage', 'showInProgressMessage',
+                    'showSuccessMessage', 'showErrorMessage'
                 );
             },
 
@@ -104,16 +99,20 @@
             },
 
             title: function (text) {
-                return HtmlUtils.setHtml(this.$('.u-field-title'), text);
+                return this.$('.u-field-title').text(text);
             },
 
-            getMessage: function(message_status) {
+            getMessageHTML: function(message_status) {
                 if ((message_status + 'Message') in this) {
                     return this[message_status + 'Message'].call(this);
                 } else if (this.showMessages) {
                     return HtmlUtils.joinHtml(this.indicators[message_status], this.messages[message_status]);
                 }
                 return this.indicators[message_status];
+            },
+
+            getMessage: function(message) {
+                return this.getMessageHTML(message).toString();
             },
 
             showHelpMessage: function (message) {
@@ -135,19 +134,19 @@
 
             showCanEditMessage: function(show) {
                 if (!_.isUndefined(show) && show) {
-                    this.showNotificationMessage(this.getMessage('canEdit'));
+                    this.showNotificationMessage(this.getMessageHTML('canEdit'));
                 } else {
                     this.showNotificationMessage('');
                 }
             },
 
             showInProgressMessage: function () {
-                this.showNotificationMessage(this.getMessage('inProgress'));
+                this.showNotificationMessage(this.getMessageHTML('inProgress'));
             },
 
             showSuccessMessage: function () {
                 var successMessage = this.getMessage('success');
-                this.showNotificationMessage(successMessage);
+                this.showNotificationMessage(this.getMessageHTML('success'));
 
                 if (this.options.refreshPageOnSave) {
                     location.reload(true);
@@ -160,7 +159,7 @@
 
                 setTimeout(function () {
                     if ((context === view.lastSuccessMessageContext) &&
-                        (view.getNotificationMessage() === successMessage.toString())) {
+                        (view.getNotificationMessage() === successMessage)) {
                         if (view.editable === 'toggle') {
                             view.showCanEditMessage(true);
                         } else {
@@ -174,16 +173,14 @@
                 if (xhr.status === 400) {
                     try {
                         var errors = JSON.parse(xhr.responseText),
-                            validationErrorMessage = HtmlUtils.ensureHtml(
-                                errors.field_errors[this.options.valueAttribute].user_message
-                            ),
+                            validationErrorMessage = errors.field_errors[this.options.valueAttribute].user_message,
                             message = HtmlUtils.joinHtml(this.indicators.validationError, validationErrorMessage);
                         this.showNotificationMessage(message);
                     } catch (error) {
-                        this.showNotificationMessage(this.getMessage('error'));
+                        this.showNotificationMessage(this.getMessageHTML('error'));
                     }
                 } else {
-                    this.showNotificationMessage(this.getMessage('error'));
+                    this.showNotificationMessage(this.getMessageHTML('error'));
                 }
             }
         });
@@ -319,7 +316,7 @@
             },
 
             updateValueInField: function () {
-                HtmlUtils.setHtml(this.$('.u-field-value '), HtmlUtils.ensureHtml(this.modelValue()));
+                this.$('.u-field-value ').text(this.modelValue());
             }
         });
 
@@ -450,7 +447,7 @@
                     value = this.options.placeholderValue || '';
                 }
                 this.$('.u-field-value').attr('aria-label', this.options.title);
-                HtmlUtils.setHtml(this.$('.u-field-value-readonly'), HtmlUtils.ensureHtml(value));
+                this.$('.u-field-value-readonly').text(value);
 
                 if (this.mode === 'display') {
                     this.updateDisplayModeClass();
