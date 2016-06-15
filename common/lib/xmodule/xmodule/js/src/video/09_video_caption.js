@@ -7,9 +7,7 @@
         'video/00_async_process.js',
         'edx-ui-toolkit/js/utils/html-utils',
         'draggabilly',
-        'modernizr',
-        'afontgarde',
-        'edxicons'
+        'modernizr'
     ], function (Sjson, AsyncProcess, HtmlUtils, Draggabilly) {
 
         /**
@@ -84,16 +82,12 @@
                 var langHtml = HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<div class="grouped-controls">'),
                         HtmlUtils.HTML('<button class="control toggle-captions" aria-disabled="false">'),
-                            HtmlUtils.HTML('<span class="icon-fallback-img">'),
-                                HtmlUtils.HTML('<span class="icon fa fa-cc" aria-hidden="true"></span>'),
-                                HtmlUtils.HTML('<span class="sr control-text"></span>'),
-                            HtmlUtils.HTML('</span>'),
+                            HtmlUtils.HTML('<span class="icon fa fa-cc" aria-hidden="true"></span>'),
+                            HtmlUtils.HTML('<span class="sr-only control-text"></span>'),
                         HtmlUtils.HTML('</button>'),
                         HtmlUtils.HTML('<button class="control toggle-transcript" aria-disabled="false">'),
-                            HtmlUtils.HTML('<span class="icon-fallback-img">'),
-                                HtmlUtils.HTML('<span class="icon fa fa-quote-left" aria-hidden="true"></span>'),
-                                HtmlUtils.HTML('<span class="sr control-text"></span>'),
-                            HtmlUtils.HTML('</span>'),
+                            HtmlUtils.HTML('<span class="icon fa fa-quote-left" aria-hidden="true"></span>'),
+                            HtmlUtils.HTML('<span class="sr-only control-text"></span>'),
                         HtmlUtils.HTML('</button>'),
                         HtmlUtils.HTML('<div class="lang menu-container" role="application">'),
                             HtmlUtils.HTML('<p class="sr instructions" id="lang-instructions"></p>'),
@@ -102,10 +96,8 @@
                                 HtmlUtils.HTML('title="'),
                                     gettext('Open language menu'),
                                 HtmlUtils.HTML('">'),
-                                HtmlUtils.HTML('<span class="icon-fallback-img">'),
-                                    HtmlUtils.HTML('<span class="icon fa fa-caret-left" aria-hidden="true"></span>'),
-                                    HtmlUtils.HTML('<span class="sr control-text"></span>'),
-                                HtmlUtils.HTML('</span>'),
+                                HtmlUtils.HTML('<span class="icon fa fa-caret-left" aria-hidden="true"></span>'),
+                                HtmlUtils.HTML('<span class="sr-only control-text"></span>'),
                             HtmlUtils.HTML('</button>'),
                         HtmlUtils.HTML('</div>'),
                     HtmlUtils.HTML('</div>)')

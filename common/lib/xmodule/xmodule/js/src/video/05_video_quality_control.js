@@ -10,18 +10,16 @@ function () {
         '<button class="control quality-control is-hidden" aria-disabled="false" title="',
             gettext('High Definition'),
         '">',
-            '<span class="icon-fallback-img">',
-                '<span class="icon icon-hd" aria-hidden="true">HD</span>', // "HD" is treated as a proper noun
+            '<span class="icon icon-hd" aria-hidden="true">HD</span>', // "HD" is treated as a proper noun
+            // Translator note:
+            // HD stands for high definition
+            '<span class="sr-only text-translation">',
+                gettext('High Definition'),
+            '</span>&nbsp;',
+            '<span class="text control-text">',
                 // Translator note:
-                // HD stands for high definition
-                '<span class="sr text-translation">',
-                    gettext('High Definition'),
-                '</span>&nbsp;',
-                '<span class="text control-text">',
-                    // Translator note:
-                    // Values are 'off' or 'on' depending on the state of the HD control
-                    gettext('off'),
-                '</span>',
+                // Values are 'off' or 'on' depending on the state of the HD control
+                gettext('off'),
             '</span>',
         '</button>'
     ].join('');

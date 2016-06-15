@@ -5,11 +5,9 @@ define('video/04_video_full_screen.js', [], function () {
         '<button class="control add-fullscreen" aria-disabled="false" title="',
             gettext('Fill browser'),
         '">',
-            '<span class="icon-fallback-img">',
-                '<span class="icon fa fa-arrows-alt" aria-hidden="true"></span>',
-                '<span class="sr control-text">',
-                    gettext('Fill browser'),
-                '</span>',
+            '<span class="icon fa fa-arrows-alt" aria-hidden="true"></span>',
+            '<span class="sr-only control-text">',
+                gettext('Fill browser'),
             '</span>',
         '</button>'
     ].join('');
@@ -141,8 +139,8 @@ define('video/04_video_full_screen.js', [], function () {
         $(window).scrollTop(this.scrollPos);
         this.videoFullScreen.fullScreenEl
             .find('.icon')
-                .removeClass('fa-compress')
-                .addClass('fa-arrows-alt')
+                .removeClass('fa fa-compress')
+                .addClass('fa fa-arrows-alt')
                 .find('.control-text')
                     .text(gettext('Fill browser'));
 
@@ -164,8 +162,8 @@ define('video/04_video_full_screen.js', [], function () {
         fullScreenClassNameEl.addClass('video-fullscreen');
         this.videoFullScreen.fullScreenEl
             .find('.icon')
-                .removeClass('fa-arrows-alt')
-                .addClass('fa-compress')
+                .removeClass('fa fa-arrows-alt')
+                .addClass('fa fa-compress')
                 .find('.control-text')
                     .text(gettext('Exit full browser'));
 

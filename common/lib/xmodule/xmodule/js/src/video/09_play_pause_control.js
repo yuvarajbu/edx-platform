@@ -28,11 +28,9 @@ define('video/09_play_pause_control.js', [], function() {
             '<button class="control video_control play" aria-disabled="false" title="',
                 gettext('Play'),
             '">',
-                '<span class="icon-fallback-img">',
-                    '<span class="icon fa fa-play" aria-hidden="true"></span>',
-                    '<span class="sr control-text">',
-                        gettext('Play'),
-                    '</span>',
+                '<span class="icon fa fa-play" aria-hidden="true"></span>',
+                '<span class="sr-only control-text">',
+                    gettext('Play'),
                 '</span>',
             '</button>'
         ].join(''),
@@ -81,8 +79,8 @@ define('video/09_play_pause_control.js', [], function() {
                 .removeClass('play')
                 .attr('title', gettext('Pause'))
                 .find('.icon')
-                    .removeClass('fa-play')
-                    .addClass('fa-pause');
+                    .removeClass('fa fa-play')
+                    .addClass('fa fa-pause');
 
             this.el
                 .find('.control-text')
@@ -95,8 +93,8 @@ define('video/09_play_pause_control.js', [], function() {
                 .addClass('play')
                 .attr('title', gettext('Play'))
                 .find('.icon')
-                    .removeClass('fa-pause')
-                    .addClass('fa-play');
+                    .removeClass('fa fa-pause')
+                    .addClass('fa fa-play');
 
             this.el
                 .find('.control-text')

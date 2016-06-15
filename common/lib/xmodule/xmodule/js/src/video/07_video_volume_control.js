@@ -46,11 +46,9 @@ function() {
                     '" aria-expanded="false" title="',
                         gettext('Adjust video volume'),
                     '">',
-                    '<span class="icon-fallback-img">',
-                        '<span class="icon fa fa-volume-up" aria-hidden="true"></span>',
-                        '<span class="sr control-text">',
-                            gettext('Volume'),
-                        '</span>',
+                    '<span class="icon fa fa-volume-up" aria-hidden="true"></span>',
+                    '<span class="sr-only control-text">',
+                        gettext('Volume'),
                     '</span>',
                 '</button>',
                 '<div class="volume-slider-container" aria-hidden="true" title="',
@@ -278,8 +276,8 @@ function() {
             } else {
                 this.el
                     .find('.control .icon')
-                        .removeClass('fa-volume-off')
-                        .addClass('fa-volume-up');
+                        .removeClass('fa fa-volume-off')
+                        .addClass('fa fa-volume-up');
             }
         },
 

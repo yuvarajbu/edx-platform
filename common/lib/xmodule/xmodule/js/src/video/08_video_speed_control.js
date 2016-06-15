@@ -40,7 +40,7 @@ define(
                     '" aria-describedby="speed-instructions">',
                     '<span class="icon-fallback-img">',
                         '<span class="icon fa fa-caret-right" aria-hidden="true"></span>',
-                        '<span class="sr control-text">',
+                        '<span class="sr-only control-text">',
                             gettext('Speed'),
                         '</span>',
                     '</span>',
