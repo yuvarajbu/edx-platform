@@ -90,7 +90,7 @@ define([
                 expect(view.$('certificate-status').length).toEqual(0);
                 view.remove();
                 data.run_modes[0].certificate_url = certUrl;
-                setupView(context, false);
+                setupView(data, false);
                 expect(view.$('certificate-status').length).toEqual(1);
                 expect(view.$('certificate-status .cta-secondary').attr('href')).toEqual(certUrl);
             });
