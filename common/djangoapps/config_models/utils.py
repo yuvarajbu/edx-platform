@@ -6,6 +6,8 @@ from rest_framework.parsers import JSONParser
 from rest_framework.serializers import ModelSerializer
 from django.contrib.auth.models import User
 
+import copy
+
 
 def get_serializer_class(configuration_model):
     """ Returns a ConfigurationModel serializer class for the supplied configuration_model. """
@@ -55,6 +57,19 @@ def deserialize_json(stream, username):
     serializer_class = get_serializer_class(apps.get_model(parsed_json["model"]))
     serializer = serializer_class(data=parsed_json["data"], context={"changed_by_username": username}, many=True)
     if serializer.is_valid():
+        model_class = serializer.child.Meta.model
+        if 'fields_equal' in dir(model_class):
+            all_data = copy.deepcopy(serializer.validated_data)
+            for data in reversed(serializer.validated_data):
+                keys = set(data.keys()).intersection(model_class.KEY_FIELDS)
+                values = tuple(data[key] for key in keys)
+                current = model_class.current(*values)
+                if current.id is not None:
+                    new = model_class(**data)
+                    if current.fields_equal(new):
+                        # pass
+                        serializer.validated_data.remove(data)
+
         # Remove things here that aren't different from what is in the database?
         serializer.save()
     else:

@@ -176,3 +176,20 @@ class ConfigurationModel(models.Model):
         values = list(cls.objects.values_list(*key_fields, flat=flat).order_by().distinct())
         cache.set(cache_key, values, cls.cache_timeout)
         return values
+
+    def fields_equal(self, instance, fields_to_ignore=["id", "change_date", "changed_by"]):
+        """
+        Compares this instance's fields to the supplied instance to test for equality.
+        This will ignore any fields in `fields_to_ignore`.
+
+        Args:
+            fields_to_ignore: List of fields that should not be compared for equality
+
+        Returns: True if the checked fields are all equivalent
+        """
+        for field in self._meta.get_fields():
+            if field.name not in fields_to_ignore:
+                if getattr(instance, field.name) != getattr(self, field.name):
+                    return False
+
+        return True

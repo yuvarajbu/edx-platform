@@ -1,5 +1,5 @@
 """
-Tests of the populate_model management command.
+Tests of the populate_model management command and its helper utils.deserialize_json method.
 """
 
 import textwrap
@@ -41,6 +41,7 @@ class DeserializeJSONTests(TestCase):
         super(DeserializeJSONTests, self).setUp()
         self.test_username = 'test_worker'
         User.objects.create_user(username=self.test_username)
+        self.fixture_path = os.path.join(os.path.dirname(__file__), 'data', 'data.json')
 
     def test_deserialize_models(self):
         """
@@ -48,8 +49,7 @@ class DeserializeJSONTests(TestCase):
         A valid username is supplied for the operation.
         """
         start_date = timezone.now()
-        fixture_path = os.path.join(os.path.dirname(__file__), 'data', 'data.json')
-        with open(fixture_path) as data:
+        with open(self.fixture_path) as data:
             deserialize_json(data, self.test_username)
 
         self.assertEquals(2, len(ExampleDeserializeConfig.objects.all()))
@@ -65,6 +65,54 @@ class DeserializeJSONTests(TestCase):
         self.assertEquals(10, fred.int_field)
         self.assertGreater(fred.change_date, start_date)
         self.assertEquals(self.test_username, fred.changed_by.username)
+
+    def test_existing_entries_not_removed(self):
+        """
+        Any existing configuration model entries are retained
+        (though they may be come history)-- deserialize_json is purely additive.
+        """
+        ExampleDeserializeConfig(name="fred", enabled=True).save()
+        ExampleDeserializeConfig(name="barney", int_field=200).save()
+
+        with open(self.fixture_path) as data:
+            deserialize_json(data, self.test_username)
+
+        self.assertEquals(4, len(ExampleDeserializeConfig.objects.all()))
+        self.assertEquals(3, len(ExampleDeserializeConfig.objects.current_set()))
+
+        self.assertEquals(5, ExampleDeserializeConfig.current('betty').int_field)
+        self.assertEquals(200, ExampleDeserializeConfig.current('barney').int_field)
+
+        # The JSON file changes "enabled" to False for Fred.
+        fred = ExampleDeserializeConfig.current('fred')
+        self.assertFalse(fred.enabled)
+
+    def test_duplicate_entries_not_made(self):
+        """
+        If there is no change in an entry (besides changed_by and change_date),
+        a new entry is not made.
+        """
+        with open(self.fixture_path) as data:
+            deserialize_json(data, self.test_username)
+
+        with open(self.fixture_path) as data:
+            deserialize_json(data, self.test_username)
+
+        # Importing twice will still only result in 2 records (second import
+        # a no-op).
+        self.assertEquals(2, len(ExampleDeserializeConfig.objects.all()))
+
+        # Change Betty.
+        betty = ExampleDeserializeConfig.current('betty')
+        betty.int_field = -8
+        betty.save()
+
+        # Now importing will add a new entry for Betty.
+        with open(self.fixture_path) as data:
+            deserialize_json(data, self.test_username)
+
+        self.assertEquals(3, len(ExampleDeserializeConfig.objects.all()))
+        self.assertEquals(-8, ExampleDeserializeConfig.current('betty').int_field)
 
     def test_bad_username(self):
         """

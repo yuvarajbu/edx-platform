@@ -66,7 +66,7 @@ class Command(BaseCommand):
         if not os.path.exists(json_file):
             raise CommandError(_("File {0} does not exist").format(json_file))
 
-        print _("Importing JSON data from file {0}").format(json_file)
+        self.stdout.write(_("Importing JSON data from file {0}").format(json_file))
         with open(json_file) as data:
             deserialize_json(data, options['username'])
-        print _("Import complete")
+        self.stdout.write(_("Import complete"))
