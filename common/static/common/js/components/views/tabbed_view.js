@@ -47,8 +47,8 @@
 
                var TabbedView = Backbone.View.extend({
                    events: {
-                       'click .nav-item.tab': 'switchTab',
-                       'keydown .nav-item.tab': 'keydownHandler'
+                       'click .tab': 'switchTab',
+                       'keydown .tab': 'keydownHandler'
                    },
 
                    /**
@@ -83,7 +83,6 @@
                            return map;
                        }, {});
                    },
-
                    render: function () {
                        var self = this;
                        this.$el.html(this.template);
@@ -198,10 +197,13 @@
                    },
                    
                    keydownHandler: function(event) {
+                       event.preventDefault();
+
                         var key = event.which,
                             focused = $(event.currentTarget),
-                            index = $(event.currentTarget).parent().find('.tab').index(focused),
-                            total = $(event.currentTarget).parent().find('.tab').size() - 1;
+                            index = $(focused).parent().find('.tab').index(focused),
+                            total = $(focused).parent().find('.tab').size() - 1,
+                            tab = $(focused).data('index');
                         
                         switch (key) {
                             case keys.left:
@@ -212,6 +214,11 @@
                             case keys.right:
                             case keys.down:
                                 this.nextTab(focused, index, total, event);
+                                break;
+                                
+                            case keys.enter:
+                            case keys.space:
+                                this.setActiveTab(tab);
                                 break;
                                 
                             default:
