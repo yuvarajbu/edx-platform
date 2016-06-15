@@ -29,5 +29,5 @@ class TextbookViewPage(CoursePage):
 
         # The pdf has not necessarily loaded even though the iframe for the viewer has, so we wait for that to load
         EmptyPromise(
-            lambda: self.q(css='.textLayer').visible, "Pdf loaded"
+            lambda: self.q(css='.textLayer > div').visible, "Pdf loaded", timeout=30
         ).fulfill()
