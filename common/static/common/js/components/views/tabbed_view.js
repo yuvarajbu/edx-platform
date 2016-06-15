@@ -18,7 +18,9 @@
                     'left':     37,
                     'right':    39,
                     'down':     40,
-                    'up':       38
+                    'up':       38,
+                    'enter':    13,
+                    'space':    32
                 };
                
                var getTabPanelId = function (id) {
@@ -30,9 +32,13 @@
                    initialize: function (options) {
                        this.url = options.url;
                        this.view = options.view;
+                       this.index = options.index;
                    },
-                   render: function () {
-                       var tabPanelHtml = this.template({tabId: getTabPanelId(this.url)});
+                   render: function() {
+                       var tabPanelHtml = this.template({
+                               tabId: getTabPanelId(this.url),
+                               index: this.index
+                           });
                        this.setElement($(tabPanelHtml));
                        this.$el.append(this.view.render().el);
                        return this;
@@ -65,8 +71,12 @@
                        this.tabs = options.tabs;
                        this.template = _.template(tabbedViewTemplate)({viewLabel: options.viewLabel});
                        // Convert each view into a TabPanelView
-                       _.each(this.tabs, function (tabInfo) {
-                           tabInfo.view = new TabPanelView({url: tabInfo.url, view: tabInfo.view});
+                       _.each(this.tabs, function(tabInfo, index) {
+                           tabInfo.view = new TabPanelView({
+                               url: tabInfo.url,
+                               view: tabInfo.view,
+                               index: index
+                           });
                        }, this);
                        this.urlMap = _.reduce(this.tabs, function (map, value) {
                            map[value.url] = value;
@@ -118,7 +128,6 @@
                        this.$('.tabpanel[aria-hidden="false"]')
                         .addClass('is-hidden')
                         .attr({
-                            'aria-expanded': 'false',
                             'aria-hidden': 'true'
                         });
                        
@@ -135,7 +144,8 @@
                         .removeClass('is-hidden')
                         .attr({
                             'aria-hidden': 'false',
-                        });
+                        })
+                        .focus();
 
                        if (this.router) {
                            this.router.navigate(tab.url, {replace: true});
@@ -163,7 +173,6 @@
                         panel = $(tab).data('index');
 
                         tab.focus();
-                        this.setActiveTab(panel);
 
                         return false;
                    },
@@ -184,7 +193,6 @@
                        panel = $(tab).data('index');
 
                        tab.focus();
-                       this.setActiveTab(panel);
                        
                        return false;
                    },

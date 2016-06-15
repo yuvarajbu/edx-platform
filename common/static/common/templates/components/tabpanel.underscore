@@ -1,1 +1,1 @@
-<div role="tabpanel" class="tabpanel is-hidden" id="<%= tabId %>" tabindex="-1" aria-labelledby="tab-<%= tabId %>" aria-hidden="true"></div>
+<div role="tabpanel" class="tabpanel is-hidden" id="<%= tabId %>" tabindex="-1" aria-labelledby="tab-<%= index %>" aria-hidden="true"></div>

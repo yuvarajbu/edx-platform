@@ -94,9 +94,11 @@
                        });
                    });
                    
-                   it('works with keyboard navigation RIGHT', function() {
+                   it('works with keyboard navigation RIGHT and ENTER', function() {
                        view.$('.nav-item[data-index=0]').focus();
-                       view.$('.nav-item[data-index=0]').trigger(keyPressEvent(keys.RIGHT));
+                       view.$('.nav-item[data-index=0]')
+                        .trigger(keyPressEvent(keys.RIGHT))
+                        .trigger(keyPressEvent(keys.ENTER));
                        
                        expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
                            'aria-expanded': 'false',
@@ -110,9 +112,10 @@
                        });
                    });
                    
-                   it('works with keyboard navigation DOWN and wraps', function() {
+                   it('works with keyboard navigation DOWN and wraps and ENTER', function() {
                        view.$('.nav-item[data-index=1]').focus();
                        view.$('.nav-item[data-index=1]').trigger(keyPressEvent(keys.DOWN));
+                       view.$('.nav-item[data-index=1]').trigger(keyPressEvent(keys.ENTER));
                        
                        expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
                            'aria-expanded': 'false',
@@ -126,9 +129,10 @@
                        });
                    });
                    
-                   it('works with keyboard navigation LEFT', function() {
+                   it('works with keyboard navigation LEFT and ENTER', function() {
                        view.$('.nav-item[data-index=1]').focus();
                        view.$('.nav-item[data-index=1]').trigger(keyPressEvent(keys.LEFT));
+                       view.$('.nav-item[data-index=1]').trigger(keyPressEvent(keys.ENTER));
                        
                        expect(view.$('.nav-item[data-index=1]')).toHaveAttr({
                            'aria-expanded': 'false',
@@ -142,9 +146,10 @@
                        });
                    });
                    
-                   it('works with keyboard navigation UP and wraps', function() {
+                   it('works with keyboard navigation UP and wraps and ENTER', function() {
                        view.$('.nav-item[data-index=0]').focus();
                        view.$('.nav-item[data-index=0]').trigger(keyPressEvent(keys.UP));
+                       view.$('.nav-item[data-index=0]').trigger(keyPressEvent(keys.ENTER));
                        
                        expect(view.$('.nav-item[data-index=0]')).toHaveAttr({
                            'aria-expanded': 'false',
