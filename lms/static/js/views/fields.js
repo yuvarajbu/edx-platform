@@ -85,8 +85,8 @@
                 this.enabled = _.isUndefined(this.options.enabled) ? true: this.options.enabled;
 
                 _.bindAll(this, 'modelValue', 'modelValueIsSet', 'showNotificationMessage','getNotificationMessage',
-                    'getMessageHTML', 'getMessage', 'title', 'showHelpMessage', 'showInProgressMessage',
-                    'showSuccessMessage', 'showErrorMessage'
+                    'getMessage', 'title', 'showHelpMessage', 'showInProgressMessage', 'showSuccessMessage',
+                    'showErrorMessage'
                 );
             },
 
@@ -102,17 +102,13 @@
                 return this.$('.u-field-title').text(text);
             },
 
-            getMessageHTML: function(message_status) {
+            getMessage: function(message_status) {
                 if ((message_status + 'Message') in this) {
                     return this[message_status + 'Message'].call(this);
                 } else if (this.showMessages) {
                     return HtmlUtils.joinHtml(this.indicators[message_status], this.messages[message_status]);
                 }
                 return this.indicators[message_status];
-            },
-
-            getMessage: function(message) {
-                return this.getMessageHTML(message).toString();
             },
 
             showHelpMessage: function (message) {
@@ -134,19 +130,19 @@
 
             showCanEditMessage: function(show) {
                 if (!_.isUndefined(show) && show) {
-                    this.showNotificationMessage(this.getMessageHTML('canEdit'));
+                    this.showNotificationMessage(this.getMessage('canEdit'));
                 } else {
                     this.showNotificationMessage('');
                 }
             },
 
             showInProgressMessage: function () {
-                this.showNotificationMessage(this.getMessageHTML('inProgress'));
+                this.showNotificationMessage(this.getMessage('inProgress'));
             },
 
             showSuccessMessage: function () {
-                var successMessage = this.getMessage('success');
-                this.showNotificationMessage(this.getMessageHTML('success'));
+                var successMessage = this.getMessage('success').toString();
+                this.showNotificationMessage(this.getMessage('success'));
 
                 if (this.options.refreshPageOnSave) {
                     location.reload(true);
@@ -177,10 +173,10 @@
                             message = HtmlUtils.joinHtml(this.indicators.validationError, validationErrorMessage);
                         this.showNotificationMessage(message);
                     } catch (error) {
-                        this.showNotificationMessage(this.getMessageHTML('error'));
+                        this.showNotificationMessage(this.getMessage('error'));
                     }
                 } else {
-                    this.showNotificationMessage(this.getMessageHTML('error'));
+                    this.showNotificationMessage(this.getMessage('error'));
                 }
             }
         });
