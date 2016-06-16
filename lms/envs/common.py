@@ -1529,8 +1529,16 @@ PIPELINE_CSS = {
 
 
 common_js = set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + notes_js + instructor_dash_js)    # pylint: disable=line-too-long
-project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + notes_js + instructor_dash_js)  # pylint: disable=line-too-long
-
+project_js = (
+    set(
+        rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js') +
+        [
+            'common/js/xblock/runtime.v1.js',
+            'lms/js/xblock/lms.runtime.v1.js',
+        ]
+    )
+    - set(courseware_js + discussion_js + notes_js + instructor_dash_js)
+)
 
 PIPELINE_JS = {
     'base_application': {
@@ -1539,13 +1547,15 @@ PIPELINE_JS = {
     },
 
     'application': {
-
-        # Application will contain all paths not in courseware_only_js
-        'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + base_application_js + [
-            'js/sticky_filter.js',
-            'js/query-params.js',
-            'js/vendor/moment.min.js',
-        ],
+        'source_filenames': (
+            ['common/js/xblock/core.js'] +
+            sorted(common_js) + sorted(project_js) + base_application_js +
+            [
+                'js/sticky_filter.js',
+                'js/query-params.js',
+                'js/vendor/moment.min.js',
+            ]
+        ),
         'output_filename': 'js/lms-application.js',
     },
     'proctoring': {
