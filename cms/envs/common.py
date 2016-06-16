@@ -913,6 +913,10 @@ INSTALLED_APPS = (
 
     # Enables default site and redirects
     'django_sites_extensions',
+
+    # Django-rest-swagger
+     'rest_framework_swagger',
+
 )
 
 
