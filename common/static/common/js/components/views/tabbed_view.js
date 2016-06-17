@@ -29,21 +29,18 @@
 
                var TabPanelView = Backbone.View.extend({
                    template: _.template(tabPanelTemplate),
-
-                   initialize: function(options) {
+                   initialize: function (options) {
+                       this.url = options.url;
                        this.view = options.view;
                        this.index = options.index;
                    },
-
                    render: function() {
                        var tabPanelHtml = this.template({
-                               tabId: getTabPanelId(this.index),
+                               tabId: getTabPanelId(this.url),
                                index: this.index
                            });
-
                        this.setElement($(tabPanelHtml));
                        this.$el.append(this.view.render().el);
-
                        return this;
                    }
                });
@@ -69,28 +66,32 @@
                     * by the router's instantiator after this view is
                     * initialized.
                     */
-                   initialize: function(options) {
-                       this.router = null;
+                   initialize: function (options) {
+                       this.router = options.router || null;
                        this.tabs = options.tabs;
                        this.template = _.template(tabbedViewTemplate)({viewLabel: options.viewLabel});
                        // Convert each view into a TabPanelView
                        _.each(this.tabs, function(tabInfo, index) {
                            tabInfo.view = new TabPanelView({
+                               url: tabInfo.url,
                                view: tabInfo.view,
                                index: index
                            });
                        }, this);
+                       this.urlMap = _.reduce(this.tabs, function (map, value) {
+                           map[value.url] = value;
+                           return map;
+                       }, {});
                    },
                    render: function () {
                        var self = this;
-                       
                        this.$el.html(this.template);
-                       
                        _.each(this.tabs, function(tabInfo, index) {
                            var tabEl = $(_.template(tabTemplate)({
                                    index: index,
                                    title: tabInfo.title,
-                                   tabPanelId: getTabPanelId(index)
+                                   url: tabInfo.url,
+                                   tabPanelId: getTabPanelId(tabInfo.url)
                                })),
                                tabContainerEl = this.$('.tabs');
                            self.$('.page-content-nav').append(tabEl);
@@ -103,25 +104,25 @@
                        // tabs.  Otherwise continue displaying the tab
                        // corresponding to the current URL.
                        Backbone.history.navigate('');
-                       Backbone.history.stop();
-                       this.$('.tab:first')
-                        .addClass('is-active')
-                        .attr({
-                            'aria-expanded': 'true',
-                            'aria-selected': 'true',
-                            'tabindex': '-1'
-                        });
-                        
-                       this.$('.tabpanel:first')
-                        .removeClass('is-hidden')
-                        .attr({
-                            'aria-hidden': 'false'
-                        });
+                        this.$('.tab:first')
+                            .addClass('is-active')
+                            .attr({
+                                'aria-expanded': 'true',
+                                'aria-selected': 'true',
+                                'tabindex': '0'
+                            });
+
+                        this.$('.tabpanel:first')
+                            .removeClass('is-hidden')
+                            .attr({
+                                'aria-hidden': 'false',
+                            });
 
                        return this;
                    },
 
-                   setActiveTab: function (index) {
+                   setActiveTab: function(index, focus=true) {
+                       console.log(index, focus);
                        var tabMeta = this.getTabMeta(index),
                            tab = tabMeta.tab,
                            tabEl = tabMeta.element,
@@ -155,13 +156,16 @@
                         .removeClass('is-hidden')
                         .attr({
                             'aria-hidden': 'false',
-                        })
-                        .focus();
+                        });
+                        
+                        if (focus) {
+                            view.$el.focus();
+                        }
                    },
 
                    switchTab: function (event) {
                        event.preventDefault();
-                       this.setActiveTab($(event.currentTarget).data('index'));
+                       this.setActiveTab($(event.currentTarget).data('index'), true);
                    },
                    
                    previousTab: function(focused, index, total, event) {
@@ -226,7 +230,7 @@
                                 
                             case keys.enter:
                             case keys.space:
-                                this.setActiveTab(tab);
+                                this.setActiveTab(tab, true);
                                 break;
                                 
                             default:
@@ -240,10 +244,13 @@
                     */
                    getTabMeta: function (tabNameOrIndex) {
                        var tab, element;
-                        
-                        tab = this.tabs[tabNameOrIndex];
-                        element = this.$('button[data-index='+tabNameOrIndex+']');
-
+                       if (typeof tabNameOrIndex === 'string') {
+                           tab = this.urlMap[tabNameOrIndex];
+                           element = this.$('button[data-url='+tabNameOrIndex+']');
+                       }  else {
+                           tab = this.tabs[tabNameOrIndex];
+                           element = this.$('button[data-index='+tabNameOrIndex+']');
+                       }
                        return {'tab': tab, 'element': element};
                    }
                });
