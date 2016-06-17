@@ -162,54 +162,6 @@
                            'tabindex': '0'
                        });
                    });
-
-                   describe('history', function() {
-                       beforeEach(function () {
-                           spyOn(Backbone.history, 'navigate').and.callThrough();
-                           view = new TabbedView({
-                               tabs: [{
-                                   url: 'test 1',
-                                   title: 'Test 1',
-                                   view: new TestSubview({text: 'this is test text'})
-                               }, {
-                                   url: 'test 2',
-                                   title: 'Test 2',
-                                   view: new TestSubview({text: 'other text'})
-                               }],
-                               router: new Backbone.Router({
-                                   routes: {
-                                       'test 1': function () {
-                                           view.setActiveTab(0);
-                                       },
-                                       'test 2': function () {
-                                           view.setActiveTab(1);
-                                       }
-                                   }
-                               })
-                           }).render();
-                           Backbone.history.start();
-                       });
-
-                       afterEach(function () {
-                           view.router.navigate('');
-                           Backbone.history.stop();
-                       });
-
-                       it('updates the page URL on tab switches without adding to browser history', function () {
-                           view.$('.nav-item[data-index=1]').click();
-                           expect(Backbone.history.navigate).toHaveBeenCalledWith(
-                               'test 2',
-                               {replace: true}
-                           );
-                       });
-
-                       it('changes tabs on URL navigation', function () {
-                           expect(view.$('.nav-item.is-active').data('index')).toEqual(0);
-                           Backbone.history.navigate('test 2', {trigger: true});
-                           expect(view.$('.nav-item.is-active').data('index')).toEqual(1);
-                       });
-                   });
-
                });
            });
 }).call(this, define || RequireJS.define);
