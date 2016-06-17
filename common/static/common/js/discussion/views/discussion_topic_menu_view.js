@@ -1,4 +1,4 @@
-(function(Backbone) {
+(function (Backbone) {
     'use strict';
     if (Backbone) {
         this.DiscussionTopicMenuView = Backbone.View.extend({
@@ -13,7 +13,7 @@
                 'class': 'post-field'
             },
 
-            initialize: function(options) {
+            initialize: function (options) {
                 this.course_settings = options.course_settings;
                 this.currentTopicId = options.topicId;
                 this.maxNameWidth = 100;
@@ -28,12 +28,12 @@
              * should close the menu except when the target is the search field. To accomplish this, we have to ignore
              * clicks on the search field by stopping the propagation of the event.
              */
-            ignoreClick: function(event) {
+            ignoreClick: function (event) {
                 event.stopPropagation();
                 return this;
             },
 
-            render: function() {
+            render: function () {
                 var context = _.clone(this.course_settings.attributes);
                 context.topics_html = this.renderCategoryMap(this.course_settings.get('category_map'));
                 this.$el.html(_.template($('#topic-template').html())(context));
@@ -42,18 +42,20 @@
                 this.selectedTopic = this.$('.js-selected-topic');
                 this.hideTopicDropdown();
                 if (this.getCurrentTopicId()) {
-                    this.setTopic(this.$('a.topic-title').filter('[data-discussion-id="' + this.getCurrentTopicId() + '"]'));
+                    this.setTopic(
+                        this.$('a.topic-title').filter('[data-discussion-id="' + this.getCurrentTopicId() + '"]')
+                    );
                 } else {
                     this.setTopic(this.$('a.topic-title').first());
                 }
                 return this.$el;
             },
 
-            renderCategoryMap: function(map) {
+            renderCategoryMap: function (map) {
                 var category_template = _.template($('#new-post-menu-category-template').html()),
                     entry_template = _.template($('#new-post-menu-entry-template').html());
 
-                return _.map(map.children, function(name) {
+                return _.map(map.children, function (name) {
                     var html = '', entry;
                     if (_.has(map.entries, name)) {
                         entry = map.entries[name];
@@ -72,7 +74,7 @@
                 }, this).join('');
             },
 
-            toggleTopicDropdown: function(event) {
+            toggleTopicDropdown: function (event) {
                 event.preventDefault();
                 event.stopPropagation();
                 if (this.menuOpen) {
@@ -83,7 +85,7 @@
                 return this;
             },
 
-            showTopicDropdown: function() {
+            showTopicDropdown: function () {
                 this.menuOpen = true;
                 this.dropdownButton.addClass('dropped');
                 this.topicMenu.show();
@@ -94,7 +96,7 @@
                 return this;
             },
 
-            hideTopicDropdown: function() {
+            hideTopicDropdown: function () {
                 this.menuOpen = false;
                 this.dropdownButton.removeClass('dropped');
                 this.topicMenu.hide();
@@ -102,14 +104,14 @@
                 return this;
             },
 
-            handleTopicEvent: function(event) {
+            handleTopicEvent: function (event) {
                 event.preventDefault();
                 event.stopPropagation();
                 this.setTopic($(event.target));
                 return this;
             },
 
-            setTopic: function($target) {
+            setTopic: function ($target) {
                 if ($target.data('discussion-id')) {
                     this.topicText = this.getFullTopicName($target);
                     this.currentTopicId = $target.data('discussion-id');
@@ -120,11 +122,11 @@
                 return this;
             },
 
-            getCurrentTopicId: function() {
+            getCurrentTopicId: function () {
                 return this.currentTopicId;
             },
 
-            setSelectedTopicName: function(text) {
+            setSelectedTopicName: function (text) {
                 return this.selectedTopic.html(this.fitName(text));
             },
             /**
@@ -133,11 +135,11 @@
              * @param {jQuery Element} [topicElement]
              * @return {String}
              */
-            getFullTopicName: function(topicElement) {
+            getFullTopicName: function (topicElement) {
                 var name;
                 if (topicElement) {
                     name = topicElement.html();
-                    _.each(topicElement.parents('.topic-submenu'), function(item) {
+                    _.each(topicElement.parents('.topic-submenu'), function (item) {
                         name = $(item).siblings('.topic-title').text() + ' / ' + name;
                     });
                     return name;
@@ -147,7 +149,7 @@
             },
 
             // @TODO move into utils.coffee
-            getNameWidth: function(name) {
+            getNameWidth: function (name) {
                 var test = $('<div>'),
                     width;
 
@@ -164,28 +166,28 @@
             },
 
             // @TODO move into utils.coffee
-            fitName: function(name) {
+            fitName: function (name) {
                 var ellipsisText = gettext('…'),
                     partialName, path, rawName;
 
                 if (this.getNameWidth(name) < this.maxNameWidth) {
                     return name;
                 } else {
-                    path = _.map(name.split('/'), function(item){
+                    path = _.map(name.split('/'), function (item) {
                         return item.replace(/^\s+|\s+$/g, '');
                     });
                     while (path.length > 1) {
                         path.shift();
                         partialName = ellipsisText + ' / ' + path.join(' / ');
                         if (this.getNameWidth(partialName) < this.maxNameWidth) {
-                          return partialName;
+                            return partialName;
                         }
                     }
                     rawName = path[0];
                     name = ellipsisText + ' / ' + rawName;
                     while (this.getNameWidth(name) > this.maxNameWidth) {
-                      rawName = rawName.slice(0, -1);
-                      name = ellipsisText + ' / ' + rawName + ' ' + ellipsisText;
+                        rawName = rawName.slice(0, -1);
+                        name = ellipsisText + ' / ' + rawName + ' ' + ellipsisText;
                     }
                 }
                 return name;
