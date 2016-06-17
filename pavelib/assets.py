@@ -376,14 +376,16 @@ def restart_django_servers():
     ))
 
 
-def collect_assets(systems, settings):
+def collect_assets(systems, settings, output_file):
     """
     Collect static assets, including Django pipeline processing.
     `systems` is a list of systems (e.g. 'lms' or 'studio' or both)
     `settings` is the Django settings module to use.
     """
     for sys in systems:
-        sh(django_cmd(sys, settings, "collectstatic --noinput > /dev/null"))
+        sh(django_cmd(sys, settings, "collectstatic --noinput > {logfile}".format(
+            logfile=output_file
+        )))
         print("\t\tFinished collecting {} assets.".format(sys))
 
 
@@ -447,6 +449,10 @@ def update_assets(args):
         '--watch', action='store_true', default=False,
         help="Watch files for changes",
     )
+    parser.add_argument(
+        '--collect-log', dest='collect_log_file', default="/dev/null",
+        help="When running collectstatic, direct output to this log file",
+    )
     args = parser.parse_args(args)
 
     compile_templated_sass(args.system, args.settings)
@@ -456,7 +462,7 @@ def update_assets(args):
     call_task('pavelib.assets.compile_sass', options={'system': args.system, 'debug': args.debug})
 
     if args.collect:
-        collect_assets(args.system, args.settings)
+        collect_assets(args.system, args.settings, args.collect_log_file)
 
     if args.watch:
         call_task('pavelib.assets.watch_assets', options={'background': not args.debug})
