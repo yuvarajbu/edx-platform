@@ -682,6 +682,8 @@
     });
 
     var testFiles = [
+        'lms/js/spec/instructor_dashboard/membership_spec.js',
+        'lms/js/spec/instructor_dashboard/send_email_spec.js',
         'lms/js/spec/preview/preview_factory_spec.js',
         'js/spec/api_admin/catalog_preview_spec.js',
         'js/spec/courseware/bookmark_button_view_spec.js',
