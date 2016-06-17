@@ -476,6 +476,27 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                     return self.get_course_index(course_locator)['versions']
         return versions
 
+    def revert_version(self, course_locator, user_id, commit=False):
+        """
+        Helper method to revert a draft version of a course,
+        roll-backing the draft branch to previous version.
+        """
+        versions = None
+        index_entry = self.get_course_index(course_locator)
+        if index_entry is not None:
+            # TODO : fetch correct previous_version
+            previous_draft_version = index_entry['versions']['draft-branch']
+            if commit:
+                self._update_head(
+                    course_locator,
+                    index_entry,
+                    'draft-branch',
+                    previous_draft_version
+                )
+                self._flag_publish_event(course_locator)
+                return self.get_course_index(course_locator)['versions']['draft-branch']
+        return previous_draft_version
+
     def get_course_history_info(self, course_locator):
         """
         See :py:meth `xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_course_history_info`
